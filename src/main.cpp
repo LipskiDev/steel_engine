@@ -6,10 +6,12 @@
 
 #include "Shader.h"
 
+// Adjusts OpenGL's Viewport size based on window size
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// Processes User Input
 void processInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == true) {
         glfwSetWindowShouldClose(window, true);
@@ -19,6 +21,8 @@ void processInput(GLFWwindow *window) {
 
 int main() {
 
+
+    // Setup glfw window
     GLFWwindow *window;
     
     if(!glfwInit()) {
@@ -41,18 +45,17 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-    
+    // Load OpenGL
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress )) {
         std::cout << "Couldn't load OpenGL\n";
         glfwTerminate();
         return -1;
     }
 
-    int success;
-    char errLog[512];
-
+    // Setup Shader
     Shader shader("../shaders/vertexShader.glsl", "../shaders/fragmentShader.glsl");
 
+    // Triangle Vert Positions and Colors
     float vertices[] = {
         // positions        // colors
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left  
@@ -62,9 +65,11 @@ int main() {
 
     GLuint VBO, VAO;
 
+    // Create Buffer and Array Objects
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
+    // Bind Buffer and Array Objects for subsequent use
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -87,14 +92,15 @@ int main() {
     while(!glfwWindowShouldClose(window)) {
 
         processInput(window);
+        
+        // Draw Background Color
         glClearColor(.2f, .3f, .3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        
-
+        // Apply Shaders
         shader.use();
 
-
+        // Draw Triangle
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
