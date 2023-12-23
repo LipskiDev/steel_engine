@@ -8,4 +8,10 @@
 
 <br/><br/>
 * Rendering Textured Shapes
+
 ![](img/textured_rectangle.png)
+
+<br/><br/>
+* Multiple Textures for each Shape
+
+![](img/mixed_textures.png)
