@@ -4,6 +4,10 @@ cmake_policy(SET CMP0072 NEW)
 
 find_package(OpenGL REQUIRED)
 
+set(glm_DIR includes/glm)
+find_package(glm REQUIRED)
+
+
 add_executable(steel_engine 
     src/main.cpp
     src/Shader.cpp 
@@ -17,4 +21,5 @@ add_executable(steel_engine
 target_link_libraries(steel_engine 
     glfw
     OpenGL::GL
+    glm::glm
 )
