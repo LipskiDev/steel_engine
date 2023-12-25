@@ -10,10 +10,9 @@ find_package(glm REQUIRED)
 
 add_executable(steel_engine 
     src/main.cpp
-    src/Shader.cpp 
     src/Shader.h
-    src/stb_image.cpp
-    src/stb_image.h
+    lib/stb_image.cpp
+    lib/stb_image.h
     lib/glad.h 
     lib/glad.c
 )
