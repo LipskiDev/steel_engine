@@ -14,3 +14,6 @@ Directional Lights:
 Point Lights:
 
 ![](img/point_light.png)
+
+Also: multiple Light Sources!
+![](img/multiple_lights.png)
