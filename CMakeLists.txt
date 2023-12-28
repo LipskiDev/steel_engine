@@ -11,6 +11,8 @@ find_package(glm REQUIRED)
 add_executable(steel_engine 
     src/main.cpp
     src/Shader.h
+    src/terrain/terrain.h
+    src/terrain/terrain.cpp
     lib/stb_image.cpp
     lib/stb_image.h
     lib/glad.h 
