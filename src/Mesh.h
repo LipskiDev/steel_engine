@@ -46,6 +46,7 @@ public:
         setupMesh();
     }
     void Draw(Shader &shader) {
+        shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

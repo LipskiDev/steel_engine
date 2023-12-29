@@ -13,6 +13,7 @@ add_executable(steel_engine
     src/Shader.h
     src/terrain/terrain.h
     src/terrain/terrain.cpp
+    src/Mesh.h
     lib/stb_image.cpp
     lib/stb_image.h
     lib/glad.h 

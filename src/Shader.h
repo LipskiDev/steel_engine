@@ -13,6 +13,8 @@ class Shader {
 public: 
     GLuint ID;
 
+    Shader() {};
+
     Shader(const char *vertexPath, const char *fragmentPath)
     {
         using namespace std;
