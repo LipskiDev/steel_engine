@@ -15,14 +15,17 @@
 
 GLFWwindow *window;
 
+#define WINDOW_WIDTH 1000
+#define WINDOW_HEIGHT 800
+
 Camera cam(glm::vec3(0.0f, 2.0f, 3.0f));
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 bool firstMouse = true;
-float lastX = 800.0f / 2.0;
-float lastY = 600.0 / 2.0;
+float lastX = WINDOW_WIDTH / 2.0;
+float lastY = WINDOW_HEIGHT / 2.0;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -38,17 +41,18 @@ int main()
     Shader sh("../shaders/terrain.vs", "../shaders/terrain.fs");
 
     //Terrain Stuff
-    BaseTerrain bt(5, 2.f);
+    BaseTerrain bt(8, 2.f);
     bt.initTerrain();
     bt.setShader(sh);
-    bt.Render();
 
-    glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 
     glm::mat4 view = glm::mat4(1.0f);
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)800.f / 600.f, 0.1f, 100.f);
+    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.f);
+
+
+
     while (!glfwWindowShouldClose(window))
     {
 
@@ -70,6 +74,13 @@ int main()
         sh.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
         sh.setMat4("model", model);
+        sh.setVec3("viewPos", cam.Position);
+
+        sh.setVec3("dirLight.direction", glm::vec3(0.2, 0.2, 0.5));
+        sh.setVec3("dirLight.ambient", glm::vec3(-0.7, 0.9, 0.1));
+        sh.setVec3("dirLight.diffuse", glm::vec3(0.5, 0.2, 0.85));
+        sh.setVec3("dirLight.specular", glm::vec3(0.2, 0.2, 0.5));  
+    
 
         bt.Render();
 
@@ -175,7 +186,7 @@ void setup() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(800, 600, "Steel Engine", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Steel Engine", NULL, NULL);
 
     if (window == NULL)
     {
@@ -199,4 +210,5 @@ void setup() {
     }
 
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 }

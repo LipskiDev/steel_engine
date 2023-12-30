@@ -4,3 +4,4 @@
 
 Procedural Terrain Generation using Diamond-Square Algorithm!(not 100% correct yet)
 ![](img/terrain_generation.png)
+![](img/directional_light_terrain.png)
