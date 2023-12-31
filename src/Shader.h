@@ -1,8 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "../lib/glad.h"
+#include <GLFW/glfw3.h>
+#include <GL/gl3w.h>
+
 #include <glm/glm.hpp>
+
 
 #include <string>
 #include <fstream>
@@ -15,149 +18,33 @@ public:
 
     Shader() {};
 
-    Shader(const char *vertexPath, const char *fragmentPath)
-    {
-        using namespace std;
-        string vertexCode;
-        string fragmentCode;
-        ifstream vertexShaderFile;
-        ifstream fragmentShaderFile;
+    Shader(const char *vertexPath, const char *fragmentPath);
+    
 
-        vertexShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
-        fragmentShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+    void use();
 
-        try {
-            vertexShaderFile.open(vertexPath);
-            fragmentShaderFile.open(fragmentPath);
+    void setBool(const std::string &name, bool value) const;
 
-            stringstream vertexShaderStream;
-            stringstream fragmentShaderStream;
+    void setInt(const std::string &name, int value) const;
 
-            vertexShaderStream << vertexShaderFile.rdbuf();
-            fragmentShaderStream << fragmentShaderFile.rdbuf();
+    void setFloat(const std::string &name, float value) const;
 
-            vertexShaderFile.close();
-            fragmentShaderFile.close();
+    void setVec2(const std::string &name, const glm::vec2 &value) const;
 
-            vertexCode = vertexShaderStream.str();
-            fragmentCode = fragmentShaderStream.str();
+    void setVec2(const std::string &name, float x, float y) const;
 
+    void setVec3(const std::string &name, const glm::vec3 &value) const;
+    void setVec3(const std::string &name, float x, float y, float z) const;
 
-        }
-        catch(ifstream::failure e) {
-            cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << endl;
-        }
+    void setVec4(const std::string &name, const glm::vec4 &value) const;
 
-        const char *vertexShaderCode = vertexCode.c_str();
-        const char *fragmentShaderCode = fragmentCode.c_str();
+    void setVec4(const std::string &name, float x, float y, float z, float w) ;
 
-        GLuint vertex, fragment;
-        int success;
-        char errLog[512];
+    void setMat2(const std::string &name, const glm::mat2 &mat) const;
 
-        // Create Shader Objects
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    void setMat3(const std::string &name, const glm::mat3 &mat) const;
 
-
-        // Comiler and Check Vertex Shader
-        glShaderSource(vertex, 1, &vertexShaderCode, NULL);
-        glCompileShader(vertex);
-
-        glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(vertex, 512, NULL, errLog);
-            cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED: \n" << vertexPath << '\n' << errLog << endl;
-        }
-
-        // Comiler and Check Fragment Shader
-        glShaderSource(fragment, 1, &fragmentShaderCode, NULL);
-        glCompileShader(fragment);
-
-        glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(fragment, 512, NULL, errLog);
-            cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: \n" << fragmentPath << '\n' << errLog << endl;
-        }
-
-        // Link Shaders
-        ID = glCreateProgram();
-        glAttachShader(ID, vertex);
-        glAttachShader(ID, fragment);
-        glLinkProgram(ID);
-
-        glGetProgramiv(ID, GL_COMPILE_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(ID, 512, NULL, errLog);
-            cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << errLog << endl;
-        }
-
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-    }
-
-    void use()
-    {
-        glUseProgram(ID);
-    }
-
-    void setBool(const std::string &name, bool value) const
-    {
-        glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
-    }
-
-    void setInt(const std::string &name, int value) const
-    {
-        glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
-    }
-
-    void setFloat(const std::string &name, float value) const
-    {
-        glUniform1f(glGetUniformLocation(ID, name.c_str()), value);   
-    }
-
-    void setVec2(const std::string &name, const glm::vec2 &value) const
-    { 
-        glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
-    }
-    void setVec2(const std::string &name, float x, float y) const
-    { 
-        glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); 
-    }
-
-    void setVec3(const std::string &name, const glm::vec3 &value) const
-    { 
-        glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
-    }
-    void setVec3(const std::string &name, float x, float y, float z) const
-    { 
-        glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z); 
-    }
-
-    void setVec4(const std::string &name, const glm::vec4 &value) const
-    { 
-        glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
-    }
-
-    void setVec4(const std::string &name, float x, float y, float z, float w) 
-    { 
-        glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w); 
-    }
-
-    void setMat2(const std::string &name, const glm::mat2 &mat) const
-    {
-        glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-    }
-
-    void setMat3(const std::string &name, const glm::mat3 &mat) const
-    {
-        glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-    }
-
-    void setMat4(const std::string &name, const glm::mat4 &mat) const
-    {
-        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-    }
+    void setMat4(const std::string &name, const glm::mat4 &mat) const;
 
 };
 
