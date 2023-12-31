@@ -4,8 +4,9 @@ cmake_policy(SET CMP0072 NEW)
 
 find_package(OpenGL REQUIRED)
 
-set(glm_DIR includes/glm)
-find_package(glm REQUIRED)
+add_subdirectory("dependencies/glfw")
+add_subdirectory("dependencies/glm")
+add_subdirectory("dependencies/gl3w")
 
 
 add_executable(steel_engine 
