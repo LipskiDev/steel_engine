@@ -47,22 +47,10 @@ int main()
     int viewLocation = mainShader.getUniformLocation("view");
     int projectionLocation = mainShader.getUniformLocation("projection");
     int viewPosLocation = mainShader.getUniformLocation("viewPos");
-    int dirLightLocation = mainShader.getUniformLocation("dirLight");
     int dirLightDirectionLocation = mainShader.getUniformLocation("dirLight.direction");
     int dirLightAmbientLocation = mainShader.getUniformLocation("dirLight.ambient");
     int dirLightDiffuseLocation = mainShader.getUniformLocation("dirLight.diffuse");
     int dirLightSpecularLocation = mainShader.getUniformLocation("dirLight.specular");
-
-    std::cout << modelLocation << std::endl;
-    std::cout << viewLocation << std::endl;
-    std::cout << projectionLocation << std::endl;
-    std::cout << dirLightLocation << std::endl;
-    std::cout << dirLightDirectionLocation << std::endl;
-    std::cout << dirLightAmbientLocation << std::endl;
-    std::cout << dirLightDiffuseLocation << std::endl;
-    std::cout << dirLightSpecularLocation << std::endl;
-
-    
 
     //Terrain Stuff
     BaseTerrain bt(8, 2.f);
@@ -73,7 +61,7 @@ int main()
     glm::mat4 view = glm::mat4(1.0f);
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.f);
+    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 1000.f);
 
     mainShader.bind();
     Shader::setVec3(dirLightDirectionLocation, glm::vec3(1.0, 0.5, 0.2));
@@ -141,20 +129,20 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 // Processes User Input
 void processInput(GLFWwindow *window)
 {
-    float cameraSpeed = 2.5f * deltaTime;
+    float cameraSpeed = 10.f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == true)
     {
         glfwSetWindowShouldClose(window, true);
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(FORWARD, deltaTime);
+        mainCamera.ProcessKeyboard(FORWARD, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(BACKWARD, deltaTime);
+        mainCamera.ProcessKeyboard(BACKWARD, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(LEFT, deltaTime);
+        mainCamera.ProcessKeyboard(LEFT, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(RIGHT, deltaTime);
+        mainCamera.ProcessKeyboard(RIGHT, cameraSpeed);
 }
 
 
