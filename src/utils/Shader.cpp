@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "Shader.h"
 
 #include <GL/gl3w.h>
 #include <cstdlib>
