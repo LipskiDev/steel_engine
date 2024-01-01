@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "../Shader.h"
-#include "../Mesh.h"
+#include "../utils/Shader.h"
+#include "../mesh/Mesh.h"
 
 class BaseTerrain {
 public:

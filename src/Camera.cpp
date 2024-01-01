@@ -1,10 +1,13 @@
 #include "Camera.h"
-
-#include <gl/GL.h>
 #include <GL/gl3w.h>
+
 #include <GLFW/glfw3.h>
 
-Camera::Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) {
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
     Front = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
     Speed = SPEED;
     MouseSensitivity = SENSITIVITY;
@@ -39,7 +42,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
         Position += Right * velocity;
 }
 
-void Camera::ProcessMouseInput(float xoffset, float yoffset, GLboolean constrainPitch = true) {
+void Camera::ProcessMouseInput(float xoffset, float yoffset, bool constrainPitch) {
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
 

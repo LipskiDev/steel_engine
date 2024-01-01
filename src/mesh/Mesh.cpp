@@ -1,6 +1,5 @@
 
 #include <GL/gl3w.h>
-#include <GLFW/glfw3.h>
 #include "Mesh.h"
 
 void Mesh::setupMesh() {
@@ -33,7 +32,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
 }
 
 void Mesh::Draw(Shader &shader) {
-    shader.use();
+    shader.bind();
     glBindVertexArray(VAO);
     //glDrawElements();
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);

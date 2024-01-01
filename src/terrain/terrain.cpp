@@ -6,7 +6,6 @@
 #include <iomanip>
 #include <random>
 
-#include "../Mesh.h"
 
 
 BaseTerrain::BaseTerrain(int n, float worldScale)

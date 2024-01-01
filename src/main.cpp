@@ -1,22 +1,28 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
-#include "Camera.h"
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+namespace fs = std::filesystem;
+
+#include "utils/Shader.h"
 #include "terrain/terrain.h"
-#include "Mesh.h"
+#include "Camera.h"
+#include "mesh/Mesh.h"
+
+#include "config.h"
 
 GLFWwindow *window;
 
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 800
 
-Camera cam(glm::vec3(0.0f, 2.0f, 3.0f));
+Camera mainCamera(glm::vec3(0.0f, 2.0f, 3.0f));
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -31,17 +37,37 @@ void processInput(GLFWwindow *window);
 int loadTexture(char const *path);
 void setup();
 
-
-
 int main()
 {
     setup();
-    Shader sh("../shaders/terrain.vs", "../shaders/terrain.fs");
+
+    Shader mainShader(ROOT_DIR"/assets/terrainVertex.glsl", ROOT_DIR"/assets/terrainFragment.glsl"); 
+
+    int modelLocation = mainShader.getUniformLocation("model");
+    int viewLocation = mainShader.getUniformLocation("view");
+    int projectionLocation = mainShader.getUniformLocation("projection");
+    int viewPosLocation = mainShader.getUniformLocation("viewPos");
+    int dirLightLocation = mainShader.getUniformLocation("dirLight");
+    int dirLightDirectionLocation = mainShader.getUniformLocation("dirLight.direction");
+    int dirLightAmbientLocation = mainShader.getUniformLocation("dirLight.ambient");
+    int dirLightDiffuseLocation = mainShader.getUniformLocation("dirLight.diffuse");
+    int dirLightSpecularLocation = mainShader.getUniformLocation("dirLight.specular");
+
+    std::cout << modelLocation << std::endl;
+    std::cout << viewLocation << std::endl;
+    std::cout << projectionLocation << std::endl;
+    std::cout << dirLightLocation << std::endl;
+    std::cout << dirLightDirectionLocation << std::endl;
+    std::cout << dirLightAmbientLocation << std::endl;
+    std::cout << dirLightDiffuseLocation << std::endl;
+    std::cout << dirLightSpecularLocation << std::endl;
+
+    
 
     //Terrain Stuff
     BaseTerrain bt(8, 2.f);
     bt.initTerrain();
-    bt.setShader(sh);
+    bt.setShader(mainShader);
 
 
     glm::mat4 view = glm::mat4(1.0f);
@@ -49,6 +75,11 @@ int main()
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.f);
 
+    mainShader.bind();
+    Shader::setVec3(dirLightDirectionLocation, glm::vec3(1.0, 0.5, 0.2));
+    Shader::setVec3(dirLightAmbientLocation, glm::vec3(1.0, 0.5, 0.2));
+    Shader::setVec3(dirLightDiffuseLocation, glm::vec3(1.0, 0.5, 0.2));
+    Shader::setVec3(dirLightSpecularLocation, glm::vec3(1.0, 0.5, 0.2));
 
 
     while (!glfwWindowShouldClose(window))
@@ -65,20 +96,13 @@ int main()
         glClearColor(.2f, .3f, .3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        view = cam.getViewMat();
+        view = mainCamera.getViewMat();
+        Shader::setMat4(projectionLocation, projection);
+        Shader::setMat4(viewLocation, mainCamera.getViewMat());
+        Shader::setMat4(modelLocation, glm::mat4(1.0));
+        Shader::setVec3(viewPosLocation, mainCamera.Position);
 
-        sh.use();
-        sh.setMat4("projection", projection);
-        sh.setMat4("view", view);
-        glm::mat4 model = glm::mat4(1.0f);
-        sh.setMat4("model", model);
-        sh.setVec3("viewPos", cam.Position);
-
-        sh.setVec3("dirLight.direction", glm::vec3(0.2, 0.2, 0.5));
-        sh.setVec3("dirLight.ambient", glm::vec3(-0.7, 0.9, 0.1));
-        sh.setVec3("dirLight.diffuse", glm::vec3(0.5, 0.2, 0.85));
-        sh.setVec3("dirLight.specular", glm::vec3(0.2, 0.2, 0.5));  
-    
+        // Shader::setVec3()
 
         bt.Render();
 
@@ -111,7 +135,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    cam.ProcessMouseInput(xoffset, yoffset);
+    mainCamera.ProcessMouseInput(xoffset, yoffset, false);
 }
 
 // Processes User Input
@@ -124,13 +148,13 @@ void processInput(GLFWwindow *window)
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cam.ProcessKeyboard(FORWARD, deltaTime);
+        mainCamera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cam.ProcessKeyboard(BACKWARD, deltaTime);
+        mainCamera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cam.ProcessKeyboard(LEFT, deltaTime);
+        mainCamera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cam.ProcessKeyboard(RIGHT, deltaTime);
+        mainCamera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 
@@ -146,8 +170,8 @@ void setup() {
     }
     
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Steel Engine", NULL, NULL);

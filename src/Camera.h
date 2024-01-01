@@ -14,8 +14,6 @@ enum Camera_Movement {
 };
 
 // Default camera values
-const float YAW         = -90.0f;
-const float PITCH       =  0.0f;
 const float SPEED       =  2.5f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
@@ -37,7 +35,7 @@ public:
     float Speed;
     float MouseSensitivity;
 
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.f, float pitch = 0.0f);
 
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
@@ -51,7 +49,7 @@ public:
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime);
 
-    void ProcessMouseInput(float xoffset, float yoffset, GLboolean constrainPitch = true);
+    void ProcessMouseInput(float xoffset, float yoffset, bool constrainPitch);
 
 private:
     void updateCameraVectors();
