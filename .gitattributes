@@ -1,3 +1,1 @@
-dependencies/glew/* linguist-vendored
-dependencies/glm/* linguist-vendored
-dependencies/glfw/* linguist-vendored
+dependencies/* linguist-vendored
