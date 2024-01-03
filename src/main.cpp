@@ -39,9 +39,16 @@ void setup();
 
 int main()
 {
+    srand (time(NULL));
     setup();
 
     Shader mainShader(ROOT_DIR"/assets/terrainVertex.glsl", ROOT_DIR"/assets/terrainFragment.glsl"); 
+
+    //Terrain Stuff
+    BaseTerrain bt(5, 5.f);
+    bt.initTerrain();
+    bt.setShader(mainShader);
+
 
     int modelLocation = mainShader.getUniformLocation("model");
     int viewLocation = mainShader.getUniformLocation("view");
@@ -51,12 +58,8 @@ int main()
     int dirLightAmbientLocation = mainShader.getUniformLocation("dirLight.ambient");
     int dirLightDiffuseLocation = mainShader.getUniformLocation("dirLight.diffuse");
     int dirLightSpecularLocation = mainShader.getUniformLocation("dirLight.specular");
-
-    //Terrain Stuff
-    BaseTerrain bt(8, 2.f);
-    bt.initTerrain();
-    bt.setShader(mainShader);
-
+    int maxLocation = mainShader.getUniformLocation("maxHeight");
+    int minLocation = mainShader.getUniformLocation("minHeight");
 
     glm::mat4 view = glm::mat4(1.0f);
 
@@ -65,9 +68,12 @@ int main()
 
     mainShader.bind();
     Shader::setVec3(dirLightDirectionLocation, glm::vec3(1.0, 0.5, 0.2));
-    Shader::setVec3(dirLightAmbientLocation, glm::vec3(1.0, 0.5, 0.2));
-    Shader::setVec3(dirLightDiffuseLocation, glm::vec3(1.0, 0.5, 0.2));
+    Shader::setVec3(dirLightAmbientLocation, glm::vec3(0.5, 0.5, 0.2));
+    Shader::setVec3(dirLightDiffuseLocation, glm::vec3(1.0, 1.0, 1.0));
     Shader::setVec3(dirLightSpecularLocation, glm::vec3(1.0, 0.5, 0.2));
+
+    std::cout << bt.max << " " << bt.min << std::endl;
+    
 
 
     while (!glfwWindowShouldClose(window))
@@ -89,15 +95,15 @@ int main()
         Shader::setMat4(viewLocation, mainCamera.getViewMat());
         Shader::setMat4(modelLocation, glm::mat4(1.0));
         Shader::setVec3(viewPosLocation, mainCamera.Position);
-
-        // Shader::setVec3()
+        
+        Shader::setFloat(maxLocation, bt.max);
+        Shader::setFloat(minLocation, bt.min);
 
         bt.Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    // glDeleteBuffers(1, &VBO);
 
     glfwTerminate();
     return 0;
@@ -144,7 +150,6 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         mainCamera.ProcessKeyboard(RIGHT, cameraSpeed);
 }
-
 
 void setup() {
     // Setup glfw window

@@ -4,12 +4,13 @@
 #include <ostream>
 #include <iostream>
 #include <iomanip>
-#include <random>
 
 
 
 BaseTerrain::BaseTerrain(int n, float worldScale)
 {
+    gen = std::mt19937(rd());
+    dis = std::uniform_real_distribution(-height, height);
     this->worldScale = worldScale;
     // Grid must be 2^n + 1 for Diamond-Square Algorithm
     terrainSize = pow(2, n) + 1;
@@ -74,53 +75,73 @@ void BaseTerrain::initTerrain()
 }
 
 void BaseTerrain::diamondSquare(int size) {
-    float currRange = height;
-    for(int step = size - 1; step > 1; step /= 2, currRange /= 2) {
-        for(int z = step / 2; z < size; z += step) {
-            for(int x = step / 2; x < size; x += step) {
-                diamondStep(x, z, step / 2);
-            }
-        }
+    int step = size;
 
-        for(int z = 0; z < size; z += step) {
-            for(int x = (z + step / 2) % step; x < size; x++) {
-                squareStep(x, z, step / 2);
-            }
-        }
+    while(step > 1) {
+        int half = step / 2;
+
+        diamondStep(half, step);
+        squareStep(half, step);
+
+        step /= 2;
+        height /= 2;
+
     }
 }
 
-void BaseTerrain::diamondStep(int x, int z, int step) {
-    float cornerSum = 0.f;
-    int count = 0;
-    if(x - step >= 0) cornerSum += heightMap[x - step][z], count++;
-    if(x + step < heightMap.size()) cornerSum += heightMap[x + step][z], count++;
-    if(z - step >= 0) cornerSum += heightMap[x][z - step], count++;
-    if(z + step < heightMap.size()) cornerSum += heightMap[x][z + step], count++;
+void BaseTerrain::diamondStep(int half, int step) {
+    for(int x = half; x < terrainSize; x += step) {
+        for(int z = half; z < terrainSize; z += step) {
+            float cornerSum = 0.f;
+            cornerSum += heightMap[x - half][z - half];
+            cornerSum += heightMap[x + half][z - half];
+            cornerSum += heightMap[x - half][z + half];
+            cornerSum += heightMap[x + half][z + half];
 
-    float avg = cornerSum / count;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(-height, height);
-    heightMap[x][z] = avg + dis(gen);
+            cornerSum /= 4;
+            cornerSum += dis(gen) * height;
+            heightMap[x][z] = cornerSum;
+            if(cornerSum > max) max = cornerSum;
+            if(cornerSum < min) min = cornerSum;
+        }
+    }
     
 }
 
-void BaseTerrain::squareStep(int x, int z, int step)
+void BaseTerrain::squareStep(int half, int step)
 {
-    float cornerSum = 0.f;
-    int count = 0;
-    if(x - step >= 0 && z - step >= 0) cornerSum += heightMap[x - step][z - step], count++;
-    if(x - step >= 0 && z + step < heightMap.size()) heightMap[x - step][z + step], count++;
-    if(x + step < heightMap.size() && z - step >= 0) cornerSum += heightMap[x + step][z - step], count++;
-    if(x + step < heightMap.size() && z + step < heightMap.size()) heightMap[x + step][z + step], count++;
+    for (int x = 0; x < terrainSize; x += half) {
+	    for (int z = (x + half) % step; z < terrainSize; z += step) {
+            float cornerSum = 0.f;
+            int count = 0;
 
-    float avg = cornerSum / count;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(-height, height);
+		    if (x - half >= 0) {
+		    	cornerSum += heightMap[x - half][z];
+		    	count++;
+		    }
+		    
+            if (x + half < terrainSize) {
+		    	cornerSum += heightMap[x + half][z];
+		    	count++;
+		    }
+		    
+            if (z - half >= 0) {
+		    	cornerSum += heightMap[x][z - half];
+		    	count++;
+		    }
+		    
+            if (z + half < terrainSize) {
+		    	cornerSum += heightMap[x][z + half];
+		    	count++;
+		    }
 
-    heightMap[x][z] = avg + dis(gen);
+            cornerSum /= count;
+            cornerSum += dis(gen) * height;
+            heightMap[x][z] = cornerSum;
+            if(cornerSum > max) max = cornerSum;
+            if(cornerSum < min) min = cornerSum;
+        }
+    }
 }
 
 void BaseTerrain::Render()

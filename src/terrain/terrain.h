@@ -2,6 +2,7 @@
 #define TERRAIN_H
 
 #include <vector>
+#include <random>
 
 #include "../utils/Shader.h"
 #include "../mesh/Mesh.h"
@@ -9,6 +10,9 @@
 class BaseTerrain {
 public:
     BaseTerrain(int _terrainSize, float worldScale);
+
+    float max = -INFINITY;
+    float min = INFINITY;
 
     void initTerrain();
     void Render();
@@ -21,13 +25,18 @@ public:
 private:
     Mesh m;
     Shader sh;
+    
     int terrainSize = 0;
     float worldScale = 1.0f;
     std::vector<std::vector<float>> heightMap;
-    float height = 7.f;
+    float height = 7.0f;
 
-    void diamondStep(int x, int z, int step);
-    void squareStep(int x, int z, int step);
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_real_distribution<float> dis;
+
+    void diamondStep(int half, int step);
+    void squareStep(int half, int step);
 
 };
 
