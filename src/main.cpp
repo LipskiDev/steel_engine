@@ -24,6 +24,8 @@ GLFWwindow *window;
 
 Camera mainCamera(glm::vec3(0.0f, 2.0f, 3.0f));
 
+
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -33,7 +35,7 @@ float lastY = WINDOW_HEIGHT / 2.0;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, BaseTerrain **bt);
 int loadTexture(char const *path);
 void setup();
 
@@ -42,12 +44,11 @@ int main()
     srand (time(NULL));
     setup();
 
-    Shader mainShader(ROOT_DIR"/assets/terrainVertex.glsl", ROOT_DIR"/assets/terrainFragment.glsl"); 
+    Shader mainShader(ROOT_DIR"/assets/shaders/terrainVertex.glsl", ROOT_DIR"/assets/shaders/terrainFragment.glsl"); 
 
     //Terrain Stuff
-    BaseTerrain bt(5, 5.f);
-    bt.initTerrain();
-    bt.setShader(mainShader);
+    BaseTerrain *bt = new BaseTerrain(10, 1.0f);
+    bt->setShader(mainShader);
 
 
     int modelLocation = mainShader.getUniformLocation("model");
@@ -64,16 +65,16 @@ int main()
     glm::mat4 view = glm::mat4(1.0f);
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 1000.f);
+    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 10000.f);
 
     mainShader.bind();
-    Shader::setVec3(dirLightDirectionLocation, glm::vec3(1.0, 0.5, 0.2));
-    Shader::setVec3(dirLightAmbientLocation, glm::vec3(0.5, 0.5, 0.2));
-    Shader::setVec3(dirLightDiffuseLocation, glm::vec3(1.0, 1.0, 1.0));
+    Shader::setVec3(dirLightDirectionLocation, glm::vec3(1.0, -0.5, 0.2));
+    Shader::setVec3(dirLightAmbientLocation, glm::vec3(0.1, 0.5, 0.2));
+    Shader::setVec3(dirLightDiffuseLocation, glm::vec3(1.0, 0.5, 0.4));
     Shader::setVec3(dirLightSpecularLocation, glm::vec3(1.0, 0.5, 0.2));
 
-    std::cout << bt.max << " " << bt.min << std::endl;
-    
+    Shader::setFloat(maxLocation, bt->max);
+    Shader::setFloat(minLocation, bt->min);
 
 
     while (!glfwWindowShouldClose(window))
@@ -84,7 +85,7 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        processInput(window);
+        processInput(window, &bt);
 
         // Draw Background Color
         glClearColor(.2f, .3f, .3f, 1.0f);
@@ -96,10 +97,9 @@ int main()
         Shader::setMat4(modelLocation, glm::mat4(1.0));
         Shader::setVec3(viewPosLocation, mainCamera.Position);
         
-        Shader::setFloat(maxLocation, bt.max);
-        Shader::setFloat(minLocation, bt.min);
+        
 
-        bt.Render();
+        bt->Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -129,18 +129,18 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    mainCamera.ProcessMouseInput(xoffset, yoffset, false);
+    mainCamera.ProcessMouseInput(xoffset, yoffset, true);
 }
 
 // Processes User Input
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, BaseTerrain **bt)
 {
-    float cameraSpeed = 10.f * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == true)
+    float cameraSpeed = 100.f * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
-
+    
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         mainCamera.ProcessKeyboard(FORWARD, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

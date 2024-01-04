@@ -4,3 +4,7 @@
 
 Procedural Terrain Generation using Diamond-Square Algorithm!
 ![](img/diamond-square-terrain.png)
+
+And with Directional Light:
+
+![](img/heightmap-with-dirlight.png)

@@ -21,6 +21,8 @@ public:
     void diamondSquare(int size);
     Shader getShader() {return sh; };
     void setShader(Shader sh) { this->sh = sh; };
+    void generateTerrain();
+    void fillMesh();
 
 private:
     Mesh m;
@@ -29,7 +31,7 @@ private:
     int terrainSize = 0;
     float worldScale = 1.0f;
     std::vector<std::vector<float>> heightMap;
-    float height = 7.0f;
+    float height = 20.0f;
 
     std::random_device rd;
     std::mt19937 gen;

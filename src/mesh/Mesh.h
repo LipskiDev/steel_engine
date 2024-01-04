@@ -23,6 +23,7 @@ public:
     Mesh() {};
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
     void Draw(Shader &shader);
+    void clearMesh();
 };
 
 #endif

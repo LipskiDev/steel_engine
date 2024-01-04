@@ -9,60 +9,33 @@
 
 BaseTerrain::BaseTerrain(int n, float worldScale)
 {
+    this->terrainSize = pow(2, n) + 1;
+    this->worldScale = worldScale;
+
     gen = std::mt19937(rd());
     dis = std::uniform_real_distribution(-height, height);
-    this->worldScale = worldScale;
-    // Grid must be 2^n + 1 for Diamond-Square Algorithm
-    terrainSize = pow(2, n) + 1;
+
+    generateTerrain();
+}
+
+// Using Diamond-Square Algorithm
+void BaseTerrain::initTerrain()
+{
+    min = INFINITY;
+    max = -INFINITY;
+
     heightMap = std::vector<std::vector<float>>(terrainSize);
 
     for(int i = 0; i < terrainSize; i++) {
         heightMap[i] = std::vector<float>(terrainSize);
     }
 
-    heightMap[0][0];
-    initTerrain();
-    std::vector<Vertex> verts;
-    std::vector<unsigned int> indices;
-
-    for(int z = 0; z < terrainSize; z++) {
-        for(int x = 0; x < terrainSize; x++) {
-            glm::vec3 normal(0.f);
-            Vertex v;
-            if (x > 0 && x < terrainSize - 1 && z > 0 && z < terrainSize - 1) {
-                glm::vec3 v1 = glm::vec3(0, heightMap[x - 1][z] - heightMap[x + 1][z], 0);
-                glm::vec3 v2 = glm::vec3(0, heightMap[x][z - 1] - heightMap[x][z + 1], 0);
-                normal = glm::normalize(glm::cross(v1, v2));
-            }
-            v.Position = glm::vec3(worldScale * x, getHeight(x, z), worldScale * z);
-            v.Normal = normal;
-
-            verts.push_back(v);
-            if(x < terrainSize - 1 && z < terrainSize - 1) {
-                int ind = x + terrainSize * z;
-                // first triangle
-                indices.push_back(ind);
-                indices.push_back(ind + 1);
-                indices.push_back(ind + terrainSize);
-
-                // second triangle
-                indices.push_back(ind + 1);
-                indices.push_back(ind + terrainSize);
-                indices.push_back(ind + terrainSize + 1);
-            }
+    for(int x = 0; x < terrainSize; x++) {
+        for(int z = 0; z < terrainSize; z++) {
+            heightMap[x][z] = 0.f;
         }
     }
-
-    m = Mesh(verts, indices);
-}
-
-// Using Diamond-Square Algorithm
-void BaseTerrain::initTerrain()
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(-height, height);
-
+    
     // Init Corners
     heightMap[0][0] = dis(gen);
     heightMap[terrainSize - 1][0] = dis(gen);
@@ -70,8 +43,6 @@ void BaseTerrain::initTerrain()
     heightMap[terrainSize - 1][terrainSize - 1] = dis(gen);
 
     diamondSquare(terrainSize);
-
-
 }
 
 void BaseTerrain::diamondSquare(int size) {
@@ -101,6 +72,7 @@ void BaseTerrain::diamondStep(int half, int step) {
             cornerSum /= 4;
             cornerSum += dis(gen) * height;
             heightMap[x][z] = cornerSum;
+            
             if(cornerSum > max) max = cornerSum;
             if(cornerSum < min) min = cornerSum;
         }
@@ -143,6 +115,59 @@ void BaseTerrain::squareStep(int half, int step)
         }
     }
 }
+
+void BaseTerrain::generateTerrain()
+{
+    initTerrain();
+    fillMesh();   
+}
+
+void BaseTerrain::fillMesh()
+{
+    m.clearMesh();
+    std::vector<Vertex> verts;
+    std::vector<unsigned int> indices;
+
+    for(int z = 0; z < terrainSize; z++) {
+        for(int x = 0; x < terrainSize; x++) {
+            glm::vec3 normal(1.f);
+            Vertex v;
+            if (x > 0 && x < terrainSize - 1 && z > 0 && z < terrainSize - 1) {
+                float left = heightMap[x - 1][z];
+                float right = heightMap[x + 1][z];
+                float up = heightMap[x][z + 1];
+                float down = heightMap[x][z - 1];
+
+                float gradient_x = (right - left) / 2.0f;
+                float gradient_z = (up - down) / 2.0f;
+
+                normal = glm::vec3(-gradient_x, 1.0f, -gradient_z);
+                float magnitude = pow(pow(normal.x, 2) + pow(normal.y, 2) + pow(normal.z, 2), 0.5);
+                normal = glm::vec3(normal.x / magnitude, normal.y / magnitude, normal.z / magnitude);
+            }
+            v.Position = glm::vec3(worldScale * x, getHeight(x, z), worldScale * z);
+            v.Normal = normal;
+
+            verts.push_back(v);
+            if(x < terrainSize - 1 && z < terrainSize - 1) {
+                int ind = x + terrainSize * z;
+                // first triangle
+                indices.push_back(ind);
+                indices.push_back(ind + 1);
+                indices.push_back(ind + terrainSize);
+
+                // second triangle
+                indices.push_back(ind + 1);
+                indices.push_back(ind + terrainSize);
+                indices.push_back(ind + terrainSize + 1);
+            }
+        }
+    }
+
+    m = Mesh(verts, indices);
+}
+
+
 
 void BaseTerrain::Render()
 {

@@ -19,21 +19,10 @@ uniform DirLight dirLight;
 uniform float maxHeight;
 uniform float minHeight;
 
-
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
-
-vec3 palette(float t) {
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(0.8, 0.8, 0.5);
-    vec3 d = vec3(0.0, 0.2, 0.5);
-    return a + b*cos(6.28318*(c*t+d));
-}
-
-float mapHeight(float x) {
-    return (x - minHeight) / (maxHeight - minHeight);
-}
+vec3 palette(float t);
+float mapHeight(float x);
 
 void main()
 {
@@ -56,7 +45,19 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     // combine results
     vec3 ambient = light.ambient;
-    vec3 diffuse = vec3(diff);
-    vec3 specular = vec3(spec);
+    vec3 diffuse = light.diffuse * diff;
+    vec3 specular = light.specular * spec;
     return (ambient + diffuse + specular);
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(0.8, 0.8, 0.5);
+    vec3 d = vec3(0.0, 0.2, 0.5);
+    return a + b*cos(6.28318*(c*t+d));
+}
+
+float mapHeight(float x) {
+    return (x - minHeight) / (maxHeight - minHeight);
 }

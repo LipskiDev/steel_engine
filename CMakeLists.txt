@@ -18,16 +18,13 @@ add_executable(steel_engine
     src/main.cpp
     src/Camera.h
     src/Camera.cpp
-    src/terrain/terrain.h
-    src/terrain/terrain.cpp
-    src/mesh/Mesh.h
-    src/mesh/Mesh.cpp
+    src/terrain/terrain.h src/terrain/terrain.cpp
+    src/mesh/Mesh.h src/mesh/Mesh.cpp
+    src/utils/Shader.h src/utils/Shader.cpp
+    src/utils/utils.h src/utils/utils.cpp
+    src/objects/DirectionalLight.h src/objects/DirectionalLight.cpp
     lib/stb_image.h
     lib/stb_image.cpp
-    src/utils/Shader.h
-    src/utils/Shader.cpp
-    src/utils/utils.h
-    src/utils/utils.cpp
 )
 
 target_link_libraries(steel_engine PUBLIC glfw glm gl3w)
