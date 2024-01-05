@@ -77,3 +77,16 @@ void Shader::bind() const {
 void Shader::unbind() {
   glUseProgram(0);
 }
+
+void Shader::addDirectionalLight(DirectionalLight light)
+{
+    int dirLightDirectionLocation = getUniformLocation("dirLight.direction");
+    int dirLightAmbientLocation = getUniformLocation("dirLight.ambient");
+    int dirLightDiffuseLocation = getUniformLocation("dirLight.diffuse");
+    int dirLightSpecularLocation = getUniformLocation("dirLight.specular");
+
+    setVec3(dirLightDirectionLocation, light.getDirection());
+    setVec3(dirLightAmbientLocation, light.geAmbient());
+    setVec3(dirLightDiffuseLocation, light.getDiffuse());
+    setVec3(dirLightSpecularLocation, light.getSpecular());
+}

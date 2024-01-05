@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <unordered_map>
 #include <string>
+#include "../objects/DirectionalLight.h"
 
 class Shader {
 public:
@@ -17,6 +18,7 @@ public:
 
     void bind() const;
     static void unbind();
+    void addDirectionalLight(DirectionalLight light);
 private:
     static unsigned int createShader(const char *path, unsigned int type);
 

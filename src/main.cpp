@@ -14,6 +14,7 @@ namespace fs = std::filesystem;
 #include "terrain/terrain.h"
 #include "Camera.h"
 #include "mesh/Mesh.h"
+#include "objects/DirectionalLight.h"
 
 #include "config.h"
 
@@ -23,8 +24,6 @@ GLFWwindow *window;
 #define WINDOW_HEIGHT 800
 
 Camera mainCamera(glm::vec3(0.0f, 2.0f, 3.0f));
-
-
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -46,36 +45,32 @@ int main()
 
     Shader mainShader(ROOT_DIR"/assets/shaders/terrainVertex.glsl", ROOT_DIR"/assets/shaders/terrainFragment.glsl"); 
 
-    //Terrain Stuff
+    //Terrain Stuff 
     BaseTerrain *bt = new BaseTerrain(10, 1.0f);
     bt->setShader(mainShader);
-
 
     int modelLocation = mainShader.getUniformLocation("model");
     int viewLocation = mainShader.getUniformLocation("view");
     int projectionLocation = mainShader.getUniformLocation("projection");
     int viewPosLocation = mainShader.getUniformLocation("viewPos");
-    int dirLightDirectionLocation = mainShader.getUniformLocation("dirLight.direction");
-    int dirLightAmbientLocation = mainShader.getUniformLocation("dirLight.ambient");
-    int dirLightDiffuseLocation = mainShader.getUniformLocation("dirLight.diffuse");
-    int dirLightSpecularLocation = mainShader.getUniformLocation("dirLight.specular");
+    
     int maxLocation = mainShader.getUniformLocation("maxHeight");
     int minLocation = mainShader.getUniformLocation("minHeight");
 
     glm::mat4 view = glm::mat4(1.0f);
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 10000.f);
+    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 1000000.f);
+
+    DirectionalLight dl(
+        glm::vec3(1.0, -0.5, 0.2),  // Direction
+        glm::vec3(0.1, 0.1, 0.1),   // Ambient
+        glm::vec3(1.0, 1.0, 1.0),   // Diffuse
+        glm::vec3(1.0, 1.0, 1.0)    // Specular
+    );
 
     mainShader.bind();
-    Shader::setVec3(dirLightDirectionLocation, glm::vec3(1.0, -0.5, 0.2));
-    Shader::setVec3(dirLightAmbientLocation, glm::vec3(0.1, 0.5, 0.2));
-    Shader::setVec3(dirLightDiffuseLocation, glm::vec3(1.0, 0.5, 0.4));
-    Shader::setVec3(dirLightSpecularLocation, glm::vec3(1.0, 0.5, 0.2));
-
-    Shader::setFloat(maxLocation, bt->max);
-    Shader::setFloat(minLocation, bt->min);
-
+    mainShader.addDirectionalLight(dl);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -96,8 +91,6 @@ int main()
         Shader::setMat4(viewLocation, mainCamera.getViewMat());
         Shader::setMat4(modelLocation, glm::mat4(1.0));
         Shader::setVec3(viewPosLocation, mainCamera.Position);
-        
-        
 
         bt->Render();
 
@@ -140,7 +133,7 @@ void processInput(GLFWwindow *window, BaseTerrain **bt)
     {
         glfwSetWindowShouldClose(window, true);
     }
-    
+
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         mainCamera.ProcessKeyboard(FORWARD, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
