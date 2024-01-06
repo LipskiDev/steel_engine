@@ -34,28 +34,23 @@ float lastY = WINDOW_HEIGHT / 2.0;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-void processInput(GLFWwindow *window, BaseTerrain **bt);
+void processInput(GLFWwindow *window);
 int loadTexture(char const *path);
 void setup();
 
 int main()
 {
-    srand (time(NULL));
     setup();
 
     Shader mainShader(ROOT_DIR"/assets/shaders/terrainVertex.glsl", ROOT_DIR"/assets/shaders/terrainFragment.glsl"); 
 
     //Terrain Stuff 
-    BaseTerrain *bt = new BaseTerrain(10, 1.0f);
-    bt->setShader(mainShader);
+    BaseTerrain *bt = new BaseTerrain(10, 1.0f, mainShader);
 
     int modelLocation = mainShader.getUniformLocation("model");
     int viewLocation = mainShader.getUniformLocation("view");
     int projectionLocation = mainShader.getUniformLocation("projection");
     int viewPosLocation = mainShader.getUniformLocation("viewPos");
-    
-    int maxLocation = mainShader.getUniformLocation("maxHeight");
-    int minLocation = mainShader.getUniformLocation("minHeight");
 
     glm::mat4 view = glm::mat4(1.0f);
 
@@ -64,12 +59,12 @@ int main()
 
     DirectionalLight dl(
         glm::vec3(1.0, -0.5, 0.2),  // Direction
-        glm::vec3(0.1, 0.1, 0.1),   // Ambient
-        glm::vec3(1.0, 1.0, 1.0),   // Diffuse
-        glm::vec3(1.0, 1.0, 1.0)    // Specular
+        glm::vec3(0.2, 0.3, 0.2),   // Ambient
+        glm::vec3(0.3, 0.1, 0.7),   // Diffuse
+        glm::vec3(0.5, 0.5, 0.5)    // Specular
     );
 
-    mainShader.bind();
+
     mainShader.addDirectionalLight(dl);
 
     while (!glfwWindowShouldClose(window))
@@ -80,7 +75,7 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        processInput(window, &bt);
+        processInput(window);
 
         // Draw Background Color
         glClearColor(.2f, .3f, .3f, 1.0f);
@@ -126,7 +121,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 }
 
 // Processes User Input
-void processInput(GLFWwindow *window, BaseTerrain **bt)
+void processInput(GLFWwindow *window)
 {
     float cameraSpeed = 100.f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

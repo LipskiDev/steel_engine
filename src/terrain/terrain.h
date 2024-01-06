@@ -9,7 +9,7 @@
 
 class BaseTerrain {
 public:
-    BaseTerrain(int _terrainSize, float worldScale);
+    BaseTerrain(int _terrainSize, float worldScale, Shader bt);
 
     float max = -INFINITY;
     float min = INFINITY;
@@ -19,7 +19,6 @@ public:
     float getHeight(int x, int y);
     float getWorldScale();
     void diamondSquare(int size);
-    Shader getShader() {return sh; };
     void setShader(Shader sh) { this->sh = sh; };
     void generateTerrain();
     void fillMesh();

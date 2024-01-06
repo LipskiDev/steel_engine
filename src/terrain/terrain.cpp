@@ -7,7 +7,7 @@
 
 
 
-BaseTerrain::BaseTerrain(int n, float worldScale)
+BaseTerrain::BaseTerrain(int n, float worldScale, Shader sh)
 {
     this->terrainSize = pow(2, n) + 1;
     this->worldScale = worldScale;
@@ -16,6 +16,15 @@ BaseTerrain::BaseTerrain(int n, float worldScale)
     dis = std::uniform_real_distribution(-height, height);
 
     generateTerrain();
+
+    this->sh = sh;
+
+    this->sh.bind();
+    int maxLocation = this->sh.getUniformLocation("maxHeight");
+    int minLocation = this->sh.getUniformLocation("minHeight");
+
+    Shader::setFloat(maxLocation, max);
+    Shader::setFloat(minLocation, min);
 }
 
 // Using Diamond-Square Algorithm
