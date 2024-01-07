@@ -20,6 +20,7 @@ private:
     std::vector<unsigned int> indices;
     void setupMesh();
     int modelLocation;
+    glm::mat4 model = glm::mat4(1.0);
     glm::vec3 worldPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 public:
     Mesh() {};

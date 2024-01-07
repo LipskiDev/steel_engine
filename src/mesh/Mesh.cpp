@@ -34,6 +34,9 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
 
 void Mesh::Draw(Shader &shader) {
     shader.bind();
+    modelLocation = shader.getUniformLocation("model");
+    model = glm::translate(model, worldPosition);
+    Shader::setMat4(modelLocation, model);
     
     glBindVertexArray(VAO);
     //glDrawElements();
