@@ -19,6 +19,8 @@ private:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     void setupMesh();
+    int modelLocation;
+    glm::vec3 worldPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 public:
     Mesh() {};
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);

@@ -40,9 +40,9 @@ public:
     float nearZ;
     float farZ; 
 
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.f, float pitch = 0.0f);
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.f, float pitch = 0.0f, float fov = 45.f, float ratio = 16.f / 9.f, float nearZ = 0.1f, float farZ = 100.f);
 
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
+    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float fov, float ratio, float nearZ, float farZ);
 
     glm::mat4 getViewMat() {
         return glm::lookAt(

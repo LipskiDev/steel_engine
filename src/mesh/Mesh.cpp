@@ -28,11 +28,13 @@ void Mesh::setupMesh() {
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->vertices = vertices;
     this->indices = indices;
+    
     setupMesh();
 }
 
 void Mesh::Draw(Shader &shader) {
     shader.bind();
+    
     glBindVertexArray(VAO);
     //glDrawElements();
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);

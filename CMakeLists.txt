@@ -16,8 +16,7 @@ configure_file(config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h @ONLY)
 
 add_executable(steel_engine 
     src/main.cpp
-    src/Camera.h
-    src/Camera.cpp
+    src/objects/Camera.h src/objects/Camera.cpp
     src/terrain/terrain.h src/terrain/terrain.cpp
     src/mesh/Mesh.h src/mesh/Mesh.cpp
     src/utils/Shader.h src/utils/Shader.cpp

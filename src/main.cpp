@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 
 #include "utils/Shader.h"
 #include "terrain/terrain.h"
-#include "Camera.h"
+#include "objects/Camera.h"
 #include "mesh/Mesh.h"
 #include "objects/DirectionalLight.h"
 
@@ -23,7 +23,7 @@ GLFWwindow *window;
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 800
 
-Camera mainCamera(glm::vec3(0.0f, 2.0f, 3.0f));
+Camera *mainCamera;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -45,47 +45,44 @@ int main()
     Shader mainShader(ROOT_DIR"/assets/shaders/terrainVertex.glsl", ROOT_DIR"/assets/shaders/terrainFragment.glsl"); 
 
     //Terrain Stuff 
-    BaseTerrain *bt = new BaseTerrain(10, 1.0f, mainShader);
-
-    int modelLocation = mainShader.getUniformLocation("model");
-    int viewLocation = mainShader.getUniformLocation("view");
-    int projectionLocation = mainShader.getUniformLocation("projection");
-    int viewPosLocation = mainShader.getUniformLocation("viewPos");
-
-    glm::mat4 view = glm::mat4(1.0f);
-
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 1000000.f);
+    BaseTerrain *bt = new BaseTerrain(10, 2.0f, mainShader);
 
     DirectionalLight dl(
         glm::vec3(1.0, -0.5, 0.2),  // Direction
-        glm::vec3(0.2, 0.3, 0.2),   // Ambient
-        glm::vec3(0.3, 0.1, 0.7),   // Diffuse
+        glm::vec3(0.2, 0.2, 0.2),   // Ambient
+        glm::vec3(0.9, 0.9, 0.9),   // Diffuse
         glm::vec3(0.5, 0.5, 0.5)    // Specular
     );
 
-
+    mainCamera = new Camera(
+        glm::vec3(0.0f, 2.0f, 3.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        -90.f,
+        0.0f,
+        45.f,
+        (float) WINDOW_WIDTH / WINDOW_HEIGHT,
+        0.1f,
+        10000.f
+    );
+    mainShader.bind();
+    
     mainShader.addDirectionalLight(dl);
+    mainShader.addCamera(mainCamera);
+
 
     while (!glfwWindowShouldClose(window))
     {
-
+        // Draw Background Color
+        glClearColor(.2f, .3f, .3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         // Calc deltaTime
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         processInput(window);
-
-        // Draw Background Color
-        glClearColor(.2f, .3f, .3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        view = mainCamera.getViewMat();
-        Shader::setMat4(projectionLocation, projection);
-        Shader::setMat4(viewLocation, mainCamera.getViewMat());
-        Shader::setMat4(modelLocation, glm::mat4(1.0));
-        Shader::setVec3(viewPosLocation, mainCamera.Position);
+        mainShader.updateCamera();
 
         bt->Render();
 
@@ -117,7 +114,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    mainCamera.ProcessMouseInput(xoffset, yoffset, true);
+    mainCamera->ProcessMouseInput(xoffset, yoffset, true);
 }
 
 // Processes User Input
@@ -130,13 +127,13 @@ void processInput(GLFWwindow *window)
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(FORWARD, cameraSpeed);
+        mainCamera->ProcessKeyboard(FORWARD, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(BACKWARD, cameraSpeed);
+        mainCamera->ProcessKeyboard(BACKWARD, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(LEFT, cameraSpeed);
+        mainCamera->ProcessKeyboard(LEFT, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        mainCamera.ProcessKeyboard(RIGHT, cameraSpeed);
+        mainCamera->ProcessKeyboard(RIGHT, cameraSpeed);
 }
 
 void setup() {

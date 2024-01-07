@@ -1,13 +1,15 @@
 #include "Camera.h"
 #include <GL/gl3w.h>
 
+#include <iostream>
+
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float fov, float ratio, float nearZ, float farZ) {
     Front = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
     Speed = SPEED;
     MouseSensitivity = SENSITIVITY;
@@ -15,10 +17,14 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
     WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
+    this->fov = fov;
+    this->aspectRatio = ratio;
+    this->nearZ = nearZ;
+    this->farZ = farZ;
     updateCameraVectors();
 }
 
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) {
+Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float fov, float ratio, float nearZ, float farZ) {
     Front = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
     Speed = SPEED;
     MouseSensitivity = SENSITIVITY;
@@ -26,6 +32,10 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
     WorldUp = glm::vec3(upX, upY, upZ);
     Yaw = yaw;
     Pitch = pitch;
+    this->fov = fov;
+    this->aspectRatio = ratio;
+    this->nearZ = nearZ;
+    this->farZ = farZ;
     updateCameraVectors();
 }
 

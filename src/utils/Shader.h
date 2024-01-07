@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include "../objects/DirectionalLight.h"
+#include "../objects/Camera.h"
 
 class Shader {
 public:
@@ -19,8 +20,15 @@ public:
     void bind() const;
     static void unbind();
     void addDirectionalLight(DirectionalLight light);
+    void addCamera(Camera *cam);
+    void updateCamera();
 private:
     static unsigned int createShader(const char *path, unsigned int type);
+    Camera *camera;
+
+    int viewLocation;
+    int projectionLocation;
+    int viewPosLocation;
 
     unsigned int shaderProgramID;
 };

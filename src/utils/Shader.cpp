@@ -3,6 +3,7 @@
 #include <GL/gl3w.h>
 #include <cstdlib>
 #include <iostream>
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "utils.h"
@@ -89,4 +90,28 @@ void Shader::addDirectionalLight(DirectionalLight light)
     Shader::setVec3(dirLightAmbientLocation, light.geAmbient());
     Shader::setVec3(dirLightDiffuseLocation, light.getDiffuse());
     Shader::setVec3(dirLightSpecularLocation, light.getSpecular());
+}
+
+void Shader::addCamera(Camera *cam)
+{
+    Shader::camera = cam;
+    viewLocation = getUniformLocation("view");
+    projectionLocation = getUniformLocation("projection");
+    viewPosLocation = getUniformLocation("viewPos");
+}
+
+void Shader::updateCamera()
+{
+    glm::mat4 view = camera->getViewMat();
+
+    glm::mat4 projection;
+    float fov = camera->fov;
+    float ratio = camera->aspectRatio;
+    float nearZ = camera->nearZ;
+    float farZ = camera->farZ;
+    projection = glm::perspective(glm::radians(45.0f), ratio, nearZ, farZ);
+
+    Shader::setMat4(projectionLocation, projection);
+    Shader::setMat4(viewLocation, view);
+    Shader::setVec3(viewPosLocation, camera->Position);
 }
