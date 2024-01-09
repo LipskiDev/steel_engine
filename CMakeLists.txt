@@ -3,6 +3,10 @@ project(steel_engine VERSION 0.1.0)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CXX_STANDARD 17)
+set(IMGUI_PATH "dependencies/imgui")
+
+file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)
+
 
 add_subdirectory("dependencies/glfw")
 add_subdirectory("dependencies/glm")
@@ -12,7 +16,9 @@ set(ROOT_DIR ${CMAKE_SOURCE_DIR})
 
 configure_file(config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h @ONLY)
 
+add_library("ImGui" STATIC ${IMGUI_SOURCES})
 
+target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 
 add_executable(steel_engine 
     src/main.cpp
@@ -22,8 +28,9 @@ add_executable(steel_engine
     src/utils/Shader.h src/utils/Shader.cpp
     src/utils/utils.h src/utils/utils.cpp
     src/objects/DirectionalLight.h src/objects/DirectionalLight.cpp
-    lib/stb_image.h
-    lib/stb_image.cpp
+    lib/stb_image.h lib/stb_image.cpp
+    ${IMGUI_PATH}/backends/imgui_impl_opengl3.h ${IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
+    ${IMGUI_PATH}/backends/imgui_impl_glfw.h ${IMGUI_PATH}/backends/imgui_impl_glfw.cpp
 )
 
-target_link_libraries(steel_engine PUBLIC glfw glm gl3w)
+target_link_libraries(steel_engine PUBLIC glfw glm gl3w ImGui)
