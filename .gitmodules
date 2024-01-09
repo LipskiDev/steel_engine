@@ -8,5 +8,6 @@
 	path = dependencies/gl3w
 	url = https://github.com/skaslev/gl3w
 [submodule "dependencies/imgui"]
-	path = dependencies/imgui
+	path = imgui
 	url = https://github.com/ocornut/imgui
+	branch = master
