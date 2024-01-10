@@ -22,6 +22,7 @@ public:
     void setShader(Shader sh) { this->sh = sh; };
     void generateTerrain();
     void fillMesh();
+    void updateHeight(float scale);
 
 private:
     Mesh m;
@@ -35,6 +36,9 @@ private:
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
+
+    int maxLocation = -1;
+    int minLocation = -1;
 
     void diamondStep(int half, int step);
     void squareStep(int half, int step);

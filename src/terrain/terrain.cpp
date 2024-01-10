@@ -20,8 +20,8 @@ BaseTerrain::BaseTerrain(int n, float worldScale, Shader sh)
     this->sh = sh;
 
     this->sh.bind();
-    int maxLocation = this->sh.getUniformLocation("maxHeight");
-    int minLocation = this->sh.getUniformLocation("minHeight");
+    maxLocation = this->sh.getUniformLocation("maxHeight");
+    minLocation = this->sh.getUniformLocation("minHeight");
 
     Shader::setFloat(maxLocation, max);
     Shader::setFloat(minLocation, min);
@@ -176,7 +176,11 @@ void BaseTerrain::fillMesh()
     m = Mesh(verts, indices);
 }
 
-
+void BaseTerrain::updateHeight(float scale)
+{
+    Shader::setFloat(maxLocation, max * scale);
+    Shader::setFloat(minLocation, min * scale);
+}
 
 void BaseTerrain::Render()
 {

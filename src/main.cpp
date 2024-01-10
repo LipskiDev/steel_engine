@@ -1,6 +1,8 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <sstream>
+
 #include "imgui.h"
 #include "../dependencies/imgui/backends/imgui_impl_glfw.h"
 #include "../dependencies/imgui/backends/imgui_impl_opengl3.h"
@@ -27,13 +29,15 @@ GLFWwindow *window;
 
 ImGuiIO io;
 
-#define WINDOW_WIDTH 1000
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 1920   
+#define WINDOW_HEIGHT 1080
 
 Camera *mainCamera;
 
 float deltaTime = 0.0f;
+float lastTime = 0.0f;
 float lastFrame = 0.0f;
+int nr_frames = 0;
 
 bool firstMouse = true;
 float lastX = WINDOW_WIDTH / 2.0;
@@ -44,6 +48,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 int loadTexture(char const *path);
 void setup();
+void updateFPS();
 
 int main()
 {
@@ -79,48 +84,47 @@ int main()
     bool show_demo_window = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    float scale = 1.0f;
+
+    int scaleLocation = mainShader.getUniformLocation("scale");
+    Shader::setFloat(scaleLocation, 1.0f);
+
+    glfwSetWindowTitle(window, "Hello World!");
 
 
     while (!glfwWindowShouldClose(window))
     {
+        // Calc deltaTime
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        updateFPS();
+
         // Draw Background Color
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+
         ImGui::NewFrame();
         {
-            static float f = 0.0f;
-            static int counter = 0;
+            ImGui::Begin("Terrain");
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+            if(ImGui::SliderFloat("Scale", &scale, 0.001f, 5.0f)) {
+                bt->updateHeight(scale);
+            }
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
         }
 
+        Shader::setFloat(scaleLocation, scale);
+        bt->updateHeight(scale);
         
-
-
         glClearColor(.2f, .3f, .3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        // Calc deltaTime
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        
 
         processInput(window);
         mainShader.updateCamera();
@@ -163,6 +167,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
         mainCamera->ProcessMouseInput(xoffset, yoffset, true);
     } else {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        firstMouse = true;
     }
     
 }
@@ -215,6 +220,7 @@ void setup() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
 
+    glfwSwapInterval(0);
 
     if (gl3wInit()) {
         std::cerr << "Failed to init gl3w" << std::endl;
@@ -233,9 +239,24 @@ void setup() {
     //ImGui::StyleColorsLight();
 
     ImGui_ImplOpenGL3_Init();
-    ImGui_ImplGlfw_InitForOpenGL(window, false);
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
 
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
+}
+
+void updateFPS()
+{
+    double currentTime = glfwGetTime();
+    double delta = currentTime - lastTime;
+    ++nr_frames;
+    if(delta >= 1.0) {
+        double fps = double(nr_frames) / delta;
+        std::stringstream ss;
+        ss << "Steel Engine - " << fps << " FPS";
+        glfwSetWindowTitle(window, ss.str().c_str());
+        nr_frames = 0;
+        lastTime = currentTime;
+    }
 }
