@@ -22,8 +22,10 @@ target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 
 add_executable(steel_engine 
     src/main.cpp
+    src/math/noise.h
     src/objects/Camera.h src/objects/Camera.cpp
     src/terrain/terrain.h src/terrain/terrain.cpp
+    src/terrain/PerlinNoiseChunkGenerator.h src/terrain/PerlinNoiseChunkGenerator.cpp
     src/mesh/Mesh.h src/mesh/Mesh.cpp
     src/utils/Shader.h src/utils/Shader.cpp
     src/utils/utils.h src/utils/utils.cpp

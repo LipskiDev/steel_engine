@@ -9,7 +9,18 @@
 
 class BaseTerrain {
 public:
-    BaseTerrain(int _terrainSize, float worldScale, Shader bt);
+    virtual void fillMesh() = 0;
+    virtual void Render() = 0;
+    void setShader(Shader sh) { this->sh = sh; };
+
+protected: 
+    Mesh m;
+    Shader sh;
+};
+
+class DiamondSquareTerrain : protected BaseTerrain{
+public:
+    DiamondSquareTerrain(int _terrainSize, float worldScale, Shader bt);
 
     float max = -INFINITY;
     float min = INFINITY;
@@ -19,15 +30,11 @@ public:
     float getHeight(int x, int y);
     float getWorldScale();
     void diamondSquare(int size);
-    void setShader(Shader sh) { this->sh = sh; };
     void generateTerrain();
     void fillMesh();
     void updateHeight(float scale);
 
-private:
-    Mesh m;
-    Shader sh;
-    
+private:    
     int terrainSize = 0;
     float worldScale = 1.0f;
     std::vector<std::vector<float>> heightMap;

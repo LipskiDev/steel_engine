@@ -19,10 +19,15 @@ uniform DirLight dirLight;
 uniform float maxHeight;
 uniform float minHeight;
 
+// Perlin Noise
+uniform float meshHeight;
+uniform float waterHeight;
+
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 palette(float t);
 float mapHeight(float x);
+vec3 getColor(float height);
 
 void main()
 {
@@ -31,7 +36,27 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     
     vec3 result = CalcDirLight(dirLight, norm, viewDir);
-    FragColor = vec4(palette(mapHeight(FragPos.y)), 1.0) * vec4(result, 1.0);
+    FragColor = vec4(getColor(FragPos.y), 1.0);
+}
+
+vec3 getColor(float height) {
+    if(height <= waterHeight * 0.5 * meshHeight) { 
+        return vec3(0.23, 0.37, 0.75);                  // Deep Water
+    } else if(height <= waterHeight * meshHeight) {
+        return vec3(0.23, 0.4, 0.75);                   // Shallow Water
+    } else if(height <= 0.15 * meshHeight) {
+        return vec3(0.82, 0.84, 0.51);                  // Sand
+    } else if(height <= 0.3 * meshHeight) {
+        return vec3(0.37, 0.65, 0.12);                  // Grass 1
+    } else if(height <= 0.4 * meshHeight) {
+        return vec3(0.25, 0.45, 0.08);                  // Grass 2
+    } else if(height <= 0.5 * meshHeight) {
+        return vec3(0.35, 0.25, 0.23);                  // Rock 1
+    } else if(height <= 0.8 * meshHeight) {
+        return vec3(0.29, 0.23, 0.21);                  // Rock 2
+    } else {
+        return vec3(1.0, 1.0, 1.0);                     // Snow
+    }
 }
 
 // calculates the color when using a directional light.

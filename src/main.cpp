@@ -3,11 +3,12 @@
 
 #include <sstream>
 
+// ImGui Imports
 #include "imgui.h"
 #include "../dependencies/imgui/backends/imgui_impl_glfw.h"
 #include "../dependencies/imgui/backends/imgui_impl_opengl3.h"
 
-
+// GLM Imports
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,6 +20,7 @@ namespace fs = std::filesystem;
 
 #include "utils/Shader.h"
 #include "terrain/terrain.h"
+#include "terrain/PerlinNoiseChunkGenerator.h"
 #include "objects/Camera.h"
 #include "mesh/Mesh.h"
 #include "objects/DirectionalLight.h"
@@ -57,7 +59,16 @@ int main()
     Shader mainShader(ROOT_DIR"/assets/shaders/terrainVertex.glsl", ROOT_DIR"/assets/shaders/terrainFragment.glsl"); 
 
     //Terrain Stuff 
-    BaseTerrain *bt = new BaseTerrain(10, 2.0f, mainShader);
+    DiamondSquareTerrain *bt = new DiamondSquareTerrain(10, 2.0f, mainShader);
+
+    PerlinNoiseChunkGenerator generator;
+
+    uint32_t waterHeightLocation = mainShader.getUniformLocation("waterHeight");
+    uint32_t meshHeightLocation = mainShader.getUniformLocation("meshHeight");
+
+    Shader::setFloat(waterHeightLocation, generator.getWaterHeight());
+    Shader::setFloat(meshHeightLocation, generator.getMeshHeight());
+    
 
     DirectionalLight dl(
         glm::vec3(1.0, -0.5, 0.2),  // Direction
@@ -81,16 +92,12 @@ int main()
     mainShader.addDirectionalLight(dl);
     mainShader.addCamera(mainCamera);
 
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     float scale = 1.0f;
 
     int scaleLocation = mainShader.getUniformLocation("scale");
+    int modelLocation = mainShader.getUniformLocation("model");
     Shader::setFloat(scaleLocation, 1.0f);
-
-    glfwSetWindowTitle(window, "Hello World!");
-
+    glm::mat4 model = glm::mat4(1.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -111,9 +118,11 @@ int main()
         {
             ImGui::Begin("Terrain");
 
-            if(ImGui::SliderFloat("Scale", &scale, 0.001f, 5.0f)) {
-                bt->updateHeight(scale);
-            }
+            // if(ImGui::SliderFloat("Scale", &scale, 0.001f, 5.0f)) {
+            //     // bt->updateHeight(scale);
+            // }
+
+            ImGui::SliderFloat("Camera Speed", &mainCamera->Speed, 1.f, 10.0f);
 
             ImGui::End();
         }
@@ -129,9 +138,19 @@ int main()
         processInput(window);
         mainShader.updateCamera();
 
+        mainShader.bind();
 
         ImGui::Render();
-        bt->Render();
+        //bt->Render();
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 10; j++) {
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, (glm::vec3(-generator.getChunkWidth() / 2.0 + (generator.getChunkWidth() - 1) * i, 0.0f,  -generator.getChunkHeight() / 2.0 + (generator.getChunkHeight() - 1) * j) / 2.0f));
+
+                Shader::setMat4(modelLocation, model);
+                generator.renderChunk(i, j);
+            }
+        }
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -175,20 +194,19 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 // Processes User Input
 void processInput(GLFWwindow *window)
 {
-    float cameraSpeed = 100.f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        mainCamera->ProcessKeyboard(FORWARD, cameraSpeed);
+        mainCamera->ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        mainCamera->ProcessKeyboard(BACKWARD, cameraSpeed);
+        mainCamera->ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        mainCamera->ProcessKeyboard(LEFT, cameraSpeed);
+        mainCamera->ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        mainCamera->ProcessKeyboard(RIGHT, cameraSpeed);
+        mainCamera->ProcessKeyboard(RIGHT, deltaTime);
 }
 
 void setup() {

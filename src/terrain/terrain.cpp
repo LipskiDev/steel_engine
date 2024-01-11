@@ -7,7 +7,7 @@
 
 
 
-BaseTerrain::BaseTerrain(int n, float worldScale, Shader sh)
+DiamondSquareTerrain::DiamondSquareTerrain(int n, float worldScale, Shader sh)
 {
     this->terrainSize = pow(2, n) + 1;
     this->worldScale = worldScale;
@@ -28,7 +28,7 @@ BaseTerrain::BaseTerrain(int n, float worldScale, Shader sh)
 }
 
 // Using Diamond-Square Algorithm
-void BaseTerrain::initTerrain()
+void DiamondSquareTerrain::initTerrain()
 {
     min = INFINITY;
     max = -INFINITY;
@@ -54,7 +54,7 @@ void BaseTerrain::initTerrain()
     diamondSquare(terrainSize);
 }
 
-void BaseTerrain::diamondSquare(int size) {
+void DiamondSquareTerrain::diamondSquare(int size) {
     int step = size;
 
     while(step > 1) {
@@ -69,7 +69,7 @@ void BaseTerrain::diamondSquare(int size) {
     }
 }
 
-void BaseTerrain::diamondStep(int half, int step) {
+void DiamondSquareTerrain::diamondStep(int half, int step) {
     for(int x = half; x < terrainSize; x += step) {
         for(int z = half; z < terrainSize; z += step) {
             float cornerSum = 0.f;
@@ -89,7 +89,7 @@ void BaseTerrain::diamondStep(int half, int step) {
     
 }
 
-void BaseTerrain::squareStep(int half, int step)
+void DiamondSquareTerrain::squareStep(int half, int step)
 {
     for (int x = 0; x < terrainSize; x += half) {
 	    for (int z = (x + half) % step; z < terrainSize; z += step) {
@@ -125,13 +125,13 @@ void BaseTerrain::squareStep(int half, int step)
     }
 }
 
-void BaseTerrain::generateTerrain()
+void DiamondSquareTerrain::generateTerrain()
 {
     initTerrain();
     fillMesh();   
 }
 
-void BaseTerrain::fillMesh()
+void DiamondSquareTerrain::fillMesh()
 {
     m.clearMesh();
     std::vector<Vertex> verts;
@@ -176,23 +176,23 @@ void BaseTerrain::fillMesh()
     m = Mesh(verts, indices);
 }
 
-void BaseTerrain::updateHeight(float scale)
+void DiamondSquareTerrain::updateHeight(float scale)
 {
     Shader::setFloat(maxLocation, max * scale);
     Shader::setFloat(minLocation, min * scale);
 }
 
-void BaseTerrain::Render()
+void DiamondSquareTerrain::Render()
 {
     m.Draw(sh);
 }
 
-float BaseTerrain::getHeight(int x, int z)
+float DiamondSquareTerrain::getHeight(int x, int z)
 {
     return heightMap[x][z];
 }
 
-float BaseTerrain::getWorldScale()
+float DiamondSquareTerrain::getWorldScale()
 {
     return worldScale;
 }

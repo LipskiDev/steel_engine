@@ -2,7 +2,12 @@
 
 **currently supporting:**
 
+Perlin Noise Generation!
+![](img/perlin_noise.png)
+
+
 Procedural Terrain Generation using Diamond-Square Algorithm!
+
 ![](img/diamond-square-terrain.png)
 
 And with Directional Light:
