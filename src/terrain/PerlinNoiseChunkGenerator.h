@@ -22,6 +22,14 @@ public:
     int getChunkHeight() {return chunkHeight; };
     float getWaterHeight() { return waterHeight; };
     float getMeshHeight() { return meshHeight; };
+    void generateAllChunks();
+
+    // Noise parameters
+    int octaves = 8;
+    float meshHeight = 64;
+    float noiseScale = 128;
+    float persistence = 0.5;
+    float lacunarity = 2;
 
 private:
 
@@ -29,24 +37,16 @@ private:
     // Map parameters
     float waterHeight = 0.1f;
     int chunkRenderDistance = 3;
-    int xMapChunks = 10;
-    int zMapChunks = 10;
-    int chunkWidth = 128;
-    int chunkHeight = 128;
+    int xMapChunks = 1;
+    int zMapChunks = 1;
+    int chunkWidth = 256;
+    int chunkHeight = 256;
     int gridPosX = 0;
     int gridPosZ = 0;
     float originX = (chunkWidth  * xMapChunks) / 2 - chunkWidth / 2;
     float originZ = (chunkHeight  * zMapChunks) / 2 - chunkHeight / 2;
 
     std::vector<uint32_t> chunks;
-
-
-    // Noise parameters
-    int octaves = 8;
-    float meshHeight = 255;
-    float noiseScale = 128;
-    float persistence = 0.5;
-    float lacunarity = 2;
 
 };
 

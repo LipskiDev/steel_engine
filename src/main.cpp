@@ -61,13 +61,13 @@ int main()
     //Terrain Stuff 
     DiamondSquareTerrain *bt = new DiamondSquareTerrain(10, 2.0f, mainShader);
 
-    PerlinNoiseChunkGenerator generator;
+    PerlinNoiseChunkGenerator *generator = new PerlinNoiseChunkGenerator();
 
     uint32_t waterHeightLocation = mainShader.getUniformLocation("waterHeight");
     uint32_t meshHeightLocation = mainShader.getUniformLocation("meshHeight");
 
-    Shader::setFloat(waterHeightLocation, generator.getWaterHeight());
-    Shader::setFloat(meshHeightLocation, generator.getMeshHeight());
+    Shader::setFloat(waterHeightLocation, generator->getWaterHeight());
+    Shader::setFloat(meshHeightLocation, generator->getMeshHeight());
     
 
     DirectionalLight dl(
@@ -124,6 +124,20 @@ int main()
 
             ImGui::SliderFloat("Camera Speed", &mainCamera->Speed, 1.f, 10.0f);
 
+            ImGui::SliderInt("Octaves", &generator->octaves, 1, 16);
+
+            ImGui::SliderFloat("Mesh Height", &generator->meshHeight, 1, 64);
+
+            ImGui::SliderFloat("Noise Scale", &generator->noiseScale, 0, 100, "%.3f");
+
+            ImGui::SliderFloat("Persistence", &generator->persistence, 0.f, 1.f);
+
+            ImGui::SliderFloat("Lacunarity", &generator->lacunarity, 1, 64);
+
+            if(ImGui::Button("Regenerate")) {
+                generator->generateAllChunks();
+            }
+
             ImGui::End();
         }
 
@@ -142,13 +156,13 @@ int main()
 
         ImGui::Render();
         //bt->Render();
-        for(int i = 0; i < 10; i++) {
-            for(int j = 0; j < 10; j++) {
+        for(int i = 0; i < 1; i++) {
+            for(int j = 0; j < 1; j++) {
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, (glm::vec3(-generator.getChunkWidth() / 2.0 + (generator.getChunkWidth() - 1) * i, 0.0f,  -generator.getChunkHeight() / 2.0 + (generator.getChunkHeight() - 1) * j) / 2.0f));
+                model = glm::translate(model, (glm::vec3(-generator->getChunkWidth() / 2.0 + (generator->getChunkWidth() - 1) * i, 0.0f,  -generator->getChunkHeight() / 2.0 + (generator->getChunkHeight() - 1) * j) / 2.0f));
 
                 Shader::setMat4(modelLocation, model);
-                generator.renderChunk(i, j);
+                generator->renderChunk(i, j);
             }
         }
 

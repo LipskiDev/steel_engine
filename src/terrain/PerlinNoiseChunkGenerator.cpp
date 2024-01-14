@@ -5,6 +5,11 @@ PerlinNoiseChunkGenerator::PerlinNoiseChunkGenerator()
 {
     chunks = std::vector<uint32_t>(xMapChunks * zMapChunks);
 
+    generateAllChunks();
+}
+
+void PerlinNoiseChunkGenerator::generateAllChunks()
+{
     for(int z = 0; z < zMapChunks; z++) {
         for(int x = 0; x < xMapChunks; x++) {
             generateMapChunk(chunks[x + z * xMapChunks], x, z);
@@ -150,13 +155,13 @@ std::vector<float> PerlinNoiseChunkGenerator::generateNormals(const std::vector<
             verts.push_back(glm::vec3(vertices[pos], vertices[pos + 1], vertices[pos + 2]));
         }
 
-            glm::vec3 U = verts[i + 1] - verts[i];
-            glm::vec3 V = verts[i + 2] - verts[i];
+        glm::vec3 U = verts[i + 1] - verts[i]; // 
+        glm::vec3 V = verts[i + 2] - verts[i];
 
-            normal = glm::normalize(-glm::cross(U, V));
-            normals.push_back(normal.x);
-            normals.push_back(normal.y);
-            normals.push_back(normal.z);
+        normal = glm::normalize(-glm::cross(U, V));
+        normals.push_back(normal.x);
+        normals.push_back(normal.y);
+        normals.push_back(normal.z);
     }
 
     return normals;
@@ -169,3 +174,5 @@ void PerlinNoiseChunkGenerator::renderChunk(int xChunk, int zChunk)
     glDrawElements(GL_TRIANGLES, chunkWidth * chunkHeight * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
+
