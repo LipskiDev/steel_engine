@@ -1,6 +1,8 @@
 #include "Shader.h"
 
 #include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <glm/glm.hpp>

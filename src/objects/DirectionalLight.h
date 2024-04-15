@@ -13,6 +13,7 @@ private:
     vec3 diffuse = vec3(0.f);
     vec3 specular = vec3(0.f);
 public:
+    DirectionalLight();
     DirectionalLight(vec3, vec3, vec3, vec3);
     vec3 getDirection() { return direction; };
     vec3 geAmbient() { return ambient; };

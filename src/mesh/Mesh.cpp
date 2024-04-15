@@ -1,5 +1,4 @@
 
-#include <GL/gl3w.h>
 #include "Mesh.h"
 
 void Mesh::setupMesh() {

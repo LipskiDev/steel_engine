@@ -7,3 +7,7 @@ DirectionalLight::DirectionalLight(vec3 lightDirection, vec3 lightAmbient, vec3 
     this->diffuse = lightDiffuse;
     this->specular = lightSpecular;
 }
+DirectionalLight::DirectionalLight()
+{
+    
+}
