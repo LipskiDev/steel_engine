@@ -121,6 +121,14 @@ void Display::drawImGuis()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void Display::initImGui() {
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+}
+
+void Display::shutdownImGui() {
+    ImGui_ImplGlfw_Shutdown();
+}
+
 void Display::addIntSlider(std::string uiName, std::string valueName, int *value, int min, int max)
 {
     ImGuiIntSlider *intSlider = new ImGuiIntSlider();

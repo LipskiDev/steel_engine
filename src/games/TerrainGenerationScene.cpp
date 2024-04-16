@@ -84,13 +84,7 @@ public:
         modelLocation = mainShader.getUniformLocation("model");
         Shader::setFloat(scaleLocation, 1.0f);
 
-        display->addFloatSlider("Terrain", "Camera Speed", &camera->Speed, 1.f, 10.f);
-        display->addIntSlider("Terrain", "Octaves", &generator->octaves, 1, 16);
-        display->addFloatSlider("Terrain", "Mesh Height", &generator->meshHeight, 1, 64);
-        display->addFloatSlider("Terrain", "Noise Scale", &generator->noiseScale, 0, 100);
-        display->addFloatSlider("Terrain", "Persistence", &generator->persistence, 0, 1);
-        display->addFloatSlider("Terrain", "Lacunarity", &generator->lacunarity, 1, 64);
-        display->addButton("Terrain", "Regenerate", [this](){ generator->generateAllChunks(); });
+        
 
     }
 
@@ -111,16 +105,21 @@ public:
         inputHandler->addButtonReleaseCallback(GLFW_MOUSE_BUTTON_RIGHT, [this](){ enterUi(); });
 
         inputHandler->addMouseMoveCallback([this](double x, double y) { lookAround(x, -y); });
-        inputHandler->addKeyHoldCallback(GLFW_KEY_ESCAPE, [this](){ display->close(); });
+        inputHandler->addKeyPressCallback(GLFW_KEY_ESCAPE, [this](){ display->close(); });
 
         glfwSetKeyCallback(display->getWindow(), &InputHandler::registerKeys);
         glfwSetMouseButtonCallback(display->getWindow(), &InputHandler::registerButtons);
         glfwSetCursorPosCallback(display->getWindow(), &InputHandler::processMouseInput);
 
+        display->addFloatSlider("Terrain", "Camera Speed", &camera->Speed, 1.f, 10.f);
+        display->addIntSlider("Terrain", "Octaves", &generator->octaves, 1, 16);
+        display->addFloatSlider("Terrain", "Mesh Height", &generator->meshHeight, 1, 640);
+        display->addFloatSlider("Terrain", "Noise Scale", &generator->noiseScale, 0, 1000);
+        display->addFloatSlider("Terrain", "Persistence", &generator->persistence, 0, 1);
+        display->addFloatSlider("Terrain", "Lacunarity", &generator->lacunarity, 1, 64);
+        display->addButton("Terrain", "Regenerate", [this](){ generator->generateAllChunks(); });
 
-        // TODO: put this somewhere else, so it makes sense and doesn't break the programm if called before onActivate()
-        ImGui_ImplGlfw_InitForOpenGL(display->getWindow(), true);
-
+        display->initImGui();
     }
 
     void enterUi() {
@@ -134,7 +133,7 @@ public:
     }
 
     void onDeactivate() {
-
+        display->shutdownImGui();
     }
 
 

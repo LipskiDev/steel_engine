@@ -76,6 +76,9 @@ public:
     void addFloatSlider(std::string uiName, std::string valueName, float *value, float min, float max);
     void addButton(std::string uiName, std::string buttonText, ImGuiButtonCallback callback);
 
+    void initImGui();
+    void shutdownImGui();
+
     void updateDeltaTime();
     float getDeltaTime();
 
