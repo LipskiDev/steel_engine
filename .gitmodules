@@ -11,3 +11,6 @@
 	path = dependencies/imgui
 	url = https://github.com/ocornut/imgui
 	branch = master
+[submodule "dependencies/assimp"]
+	path = dependencies/assimp
+	url = https://github.com/HighLo-Engine/assimp
