@@ -13,4 +13,4 @@
 	branch = master
 [submodule "dependencies/assimp"]
 	path = dependencies/assimp
-	url = https://github.com/HighLo-Engine/assimp
+	url = https://github.com/assimp/assimp
