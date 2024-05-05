@@ -69,7 +69,23 @@
         "xhash": "cpp",
         "array": "cpp",
         "cstdarg": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "any": "cpp",
+        "bitset": "cpp",
+        "cinttypes": "cpp",
+        "condition_variable": "cpp",
+        "deque": "cpp",
+        "map": "cpp",
+        "numeric": "cpp",
+        "queue": "cpp",
+        "ranges": "cpp",
+        "regex": "cpp",
+        "set": "cpp",
+        "span": "cpp",
+        "stack": "cpp",
+        "unordered_set": "cpp",
+        "variant": "cpp",
+        "xtree": "cpp"
     },
     "cmake.configureOnOpen": true
 }

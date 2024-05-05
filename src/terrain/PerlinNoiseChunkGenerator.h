@@ -2,7 +2,7 @@
 #ifndef PERLIN_NOISE_CHUNK_GENERATOR_H
 #define PERLIN_NOISE_CHUNK_GENERATOR_H
 
-#include "../mesh/Mesh.h"
+#include "../model/Mesh.h"
 #include <vector>
 
 class PerlinNoiseChunkGenerator {

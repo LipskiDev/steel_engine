@@ -73,6 +73,10 @@ void Shader::setFloat(int uniformLocation, float value) {
   glUniform1f(uniformLocation, value);
 }
 
+void Shader::setInt(int uniformLocation, int value) {
+  glUniform1i(uniformLocation, value);
+}
+
 void Shader::bind() const {
   glUseProgram(shaderProgramID);
 }

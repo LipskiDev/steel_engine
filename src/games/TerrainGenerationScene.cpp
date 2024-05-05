@@ -25,8 +25,11 @@
 #include "../ui/Display.h"
 #include "../utils/Scene.h"
 
+#include "../model/Model.h"
 
 #include "../config.h"
+
+#include <vector>
 
 class TerrainGenerationScene : virtual public Scene {
 
@@ -37,6 +40,8 @@ private:
     uint32_t waterHeightLocation;
     uint32_t meshHeightLocation;
     DirectionalLight directionalLight;
+
+    Model ourModel = Model(ROOT_DIR"/assets/models/fatTroll.obj");
 
     float scale = 1.0f;
 
@@ -54,12 +59,12 @@ public:
     }
 
     void onCreate() {
-        mainShader = Shader(ROOT_DIR"/assets/shaders/terrainVertex.glsl", ROOT_DIR"/assets/shaders/terrainFragment.glsl"); 
+        mainShader = Shader(ROOT_DIR"/assets/shaders/trollVertex.glsl", ROOT_DIR"/assets/shaders/trollFragment.glsl"); 
         mainShader.bind();
 
         generator = new PerlinNoiseChunkGenerator();
 
-        camera = new Camera(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 90.f, 1920.f / 1080.f, 10.f, 1000.f);
+        camera = new Camera(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 90.f, 1920.f / 1080.f, 1.f, 1000.f);
 
         uint32_t waterHeightLocation = mainShader.getUniformLocation("waterHeight");
         uint32_t meshHeightLocation = mainShader.getUniformLocation("meshHeight");
@@ -69,22 +74,11 @@ public:
 
         mainShader.addCamera(camera);
 
-        directionalLight = DirectionalLight(
-            glm::vec3(1.0, -0.5, 0.2),  // Direction
-            glm::vec3(0.2, 0.2, 0.2),   // Ambient
-            glm::vec3(0.9, 0.9, 0.9),   // Diffuse
-            glm::vec3(0.5, 0.5, 0.5)    // Specular
-        );
-
-        mainShader.bind();
-    
-        mainShader.addDirectionalLight(directionalLight);
-
+        
         scaleLocation = mainShader.getUniformLocation("scale");
         modelLocation = mainShader.getUniformLocation("model");
         Shader::setFloat(scaleLocation, 1.0f);
 
-        
 
     }
 
@@ -120,6 +114,17 @@ public:
         display->addButton("Terrain", "Regenerate", [this](){ generator->generateAllChunks(); });
 
         display->initImGui();
+
+        directionalLight = DirectionalLight(
+            glm::vec3(1.0, -0.5, 0.2),  // Direction
+            glm::vec3(0.8, 0.8, 0.8),   // Ambient
+            glm::vec3(0.3, 0.3, 0.3),   // Diffuse
+            glm::vec3(0.5, 0.5, 0.5)    // Specular
+        );
+
+        mainShader.bind();
+
+        mainShader.addDirectionalLight(directionalLight);
     }
 
     void enterUi() {
@@ -178,16 +183,13 @@ public:
 
     void draw(Display *display) override {
         mainShader.bind();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        uint modelLocation = mainShader.getUniformLocation("model");
+        Shader::setMat4(modelLocation, model);
 
-        for(int i = 0; i < 1; i++) {
-            for(int j = 0; j < 1; j++) {
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, (glm::vec3(-generator->getChunkWidth() / 2.0 + (generator->getChunkWidth() - 1) * i, 0.0f,  -generator->getChunkHeight() / 2.0 + (generator->getChunkHeight() - 1) * j) / 2.0f));
-
-                Shader::setMat4(modelLocation, model);
-                generator->renderChunk(i, j);
-            }
-        }
+        ourModel.Draw(mainShader);
     }
 };
 

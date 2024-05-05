@@ -136,6 +136,7 @@ void DiamondSquareTerrain::fillMesh()
     m.clearMesh();
     std::vector<Vertex> verts;
     std::vector<unsigned int> indices;
+    std::vector<Texture> textures;
 
     for(int z = 0; z < terrainSize; z++) {
         for(int x = 0; x < terrainSize; x++) {
@@ -173,7 +174,7 @@ void DiamondSquareTerrain::fillMesh()
         }
     }
 
-    m = Mesh(verts, indices);
+    m = Mesh(verts, indices, textures);
 }
 
 void DiamondSquareTerrain::updateHeight(float scale)

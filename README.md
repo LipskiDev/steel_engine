@@ -13,3 +13,10 @@ Procedural Terrain Generation using Diamond-Square Algorithm!
 And with Directional Light:
 
 ![](img/heightmap-with-dirlight.png)
+
+Model Loading using assimp:
+
+![](img/fatTroll.png)
+
+Model made by me
+Todo: Implement proper Lighting for Normalsmaps to function

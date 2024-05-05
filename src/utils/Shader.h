@@ -9,6 +9,8 @@
 
 class Shader {
 public:
+    unsigned int shaderProgramID;
+
     Shader(){};
     Shader(const char *vertPath, const char *fragPath);
 
@@ -16,6 +18,7 @@ public:
     static void setMat4(int uniformLocation, glm::mat4 mat);
     static void setFloat(int uniformLocation, float value);
     static void setVec3(int uniformLocation, glm::vec3);
+    static void setInt(int uniformLocation, int);
 
     void bind() const;
     static void unbind();
@@ -30,7 +33,6 @@ private:
     int projectionLocation;
     int viewPosLocation;
 
-    unsigned int shaderProgramID;
 };
 
 #endif // SHADER_H
