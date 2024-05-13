@@ -11,7 +11,7 @@
 
 int main() {    
 
-    SceneManager *sceneManager = SceneManager::getInstance();
+    SceneManager *sceneManager = SceneManager::instance();
     Display *display = new Display(1920, 1080, "Steel Engine");
 
     std::shared_ptr<TerrainGenerationScene> terrainGenerationScene = std::make_shared<TerrainGenerationScene>(display);

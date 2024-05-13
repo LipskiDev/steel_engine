@@ -87,7 +87,7 @@ public:
     }
 
     void onActivate() {
-        InputHandler *inputHandler = InputHandler::getInstance();
+        InputHandler *inputHandler = InputHandler::instance();
 
 
         inputHandler->addKeyHoldCallback(GLFW_KEY_W, [this](){ moveCamera(Vector2D<int>{0, 1}); });
@@ -128,12 +128,12 @@ public:
     }
 
     void enterUi() {
-        InputHandler *inputHandler = InputHandler::getInstance();
+        InputHandler *inputHandler = InputHandler::instance();
         inputHandler->showCursor(display->getWindow());
     }
 
     void exitUi() {
-        InputHandler *inputHandler = InputHandler::getInstance();
+        InputHandler *inputHandler = InputHandler::instance();
         inputHandler->hideCursor(display->getWindow());
     }
 
@@ -143,7 +143,7 @@ public:
 
 
     void processInput() {
-        InputHandler::getInstance()->processInput();
+        InputHandler::instance()->processInput();
     }
 
     void lookAround(double x, double y) {

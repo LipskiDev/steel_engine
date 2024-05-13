@@ -43,7 +43,7 @@ public:
 
     void operator=(const InputHandler &) = delete;
 
-    static InputHandler *getInstance();
+    static InputHandler *instance();
 
     void addKeyHoldCallback(int key, KeyCallbackFunction callback);
 

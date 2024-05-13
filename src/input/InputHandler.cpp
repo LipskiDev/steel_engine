@@ -10,7 +10,7 @@ InputHandler::InputHandler() {
 
 }
 
-InputHandler *InputHandler::getInstance()
+InputHandler *InputHandler::instance()
 {
     if(!inputHandler) {
         inputHandler = new InputHandler();
@@ -48,7 +48,7 @@ void InputHandler::registerKeys(GLFWwindow *window, int key, int scancode, int a
             }
         }
 
-        InputHandler::getInstance()->addKeyPress(key);
+        InputHandler::instance()->addKeyPress(key);
     } else if(action == GLFW_RELEASE) {
         auto it = inputHandler->keyReleaseCallbacks.find(key);
         if(it != inputHandler->keyReleaseCallbacks.end()) {
@@ -56,7 +56,7 @@ void InputHandler::registerKeys(GLFWwindow *window, int key, int scancode, int a
                 key2();
             }
         }
-        InputHandler::getInstance()->removeKeyPress(key);
+        InputHandler::instance()->removeKeyPress(key);
     }
 }
 
@@ -69,7 +69,7 @@ void InputHandler::registerButtons(GLFWwindow *window, int button, int action, i
             }
         }
 
-        InputHandler::getInstance()->addButtonPress(button);
+        InputHandler::instance()->addButtonPress(button);
     } else if(action == GLFW_RELEASE) {
         auto it = inputHandler->buttonReleaseCallbacks.find(button);
         if(it != inputHandler->buttonReleaseCallbacks.end()) {
@@ -78,13 +78,13 @@ void InputHandler::registerButtons(GLFWwindow *window, int button, int action, i
             }
         }
 
-        InputHandler::getInstance()->removeButtonPress(button);
+        InputHandler::instance()->removeButtonPress(button);
     }
 }
 
 void InputHandler::processMouseInput(GLFWwindow *window, double xpos, double ypos)
 {
-    InputHandler *inputHandler = InputHandler::getInstance();
+    InputHandler *inputHandler = InputHandler::instance();
 
     if(!inputHandler->bIsCursorHidden) {
         return;
@@ -95,7 +95,7 @@ void InputHandler::processMouseInput(GLFWwindow *window, double xpos, double ypo
     inputHandler->calcMouseOffset(xpos, ypos, xOffset, yOffset);
 
 
-    for(auto callback : InputHandler::getInstance()->mouseCallbacks) {
+    for(auto callback : InputHandler::instance()->mouseCallbacks) {
         callback(xOffset, yOffset);
     }
 }
@@ -164,20 +164,20 @@ void InputHandler::addButtonReleaseCallback(int key, KeyCallbackFunction callbac
 
 void InputHandler::addKeyPress(int key)
 {
-    InputHandler::getInstance()->currentlyPressedKeys.push_back(key);
+    InputHandler::instance()->currentlyPressedKeys.push_back(key);
 }
 
 void InputHandler::removeKeyPress(int key)
 {
-    InputHandler::getInstance()->currentlyPressedKeys.remove(key);
+    InputHandler::instance()->currentlyPressedKeys.remove(key);
 }
 
 void InputHandler::addButtonPress(int button) {
-    InputHandler::getInstance()->currentlyPressedButtons.push_back(button);
+    InputHandler::instance()->currentlyPressedButtons.push_back(button);
 }
 
 void InputHandler::removeButtonPress(int button) {
-    InputHandler::getInstance()->currentlyPressedButtons.remove(button);
+    InputHandler::instance()->currentlyPressedButtons.remove(button);
 }
 
 bool InputHandler::isCursorHidden()

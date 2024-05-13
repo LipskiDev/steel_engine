@@ -7,7 +7,7 @@ SceneManager::SceneManager() : scenes(0), curScene(0) {
     scenes = std::unordered_map<uint64_t, std::shared_ptr<Scene>>();
 }
 
-SceneManager* SceneManager::getInstance()
+SceneManager* SceneManager::instance()
 {
     if(!sceneManager) sceneManager = new SceneManager();
     return sceneManager;

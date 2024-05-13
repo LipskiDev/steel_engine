@@ -22,7 +22,7 @@ public:
 
     void operator=(const SceneManager &) = delete;
 
-    static SceneManager *getInstance();
+    static SceneManager *instance();
 
 
 
