@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "games/TerrainGenerationScene.cpp"
+#include "scenes/TerrainGenerationScene.cpp"
 #include "ui/Display.h"
 #include "utils/SceneManager.h"
 
@@ -16,8 +16,8 @@ int main() {
 
     std::shared_ptr<TerrainGenerationScene> terrainGenerationScene = std::make_shared<TerrainGenerationScene>(display);
 
-    uint64_t terrainGenerationSceneId = sceneManager->add(terrainGenerationScene);
-    sceneManager->switchTo(terrainGenerationSceneId);
+    sceneManager->add("Terrain Generation", terrainGenerationScene);
+    sceneManager->switchTo("Terrain Generation");
 
     while(!display->shouldClose()) {
         glfwPollEvents();

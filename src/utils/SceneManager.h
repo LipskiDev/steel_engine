@@ -31,15 +31,14 @@ public:
     void lateUpdate(float deltaTime);
     void draw(Display *display);
 
-    uint64_t add(std::shared_ptr<Scene> scene);
-    void switchTo(uint64_t sceneId);
-    void remove(uint64_t sceneId);
+    void add(std::string sceneName, std::shared_ptr<Scene> scene);
+    void switchTo(std::string sceneName);
+    void remove(std::string sceneName);
 
 private:
-    std::unordered_map<uint64_t, std::shared_ptr<Scene>> scenes;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> scenes;
 
     std::shared_ptr<Scene> curScene;
-    uint64_t insertedSceneId = 0;
     
 };
 

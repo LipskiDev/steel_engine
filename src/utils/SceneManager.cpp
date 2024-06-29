@@ -4,7 +4,7 @@ SceneManager *SceneManager::sceneManager = nullptr;
 
 
 SceneManager::SceneManager() : scenes(0), curScene(0) { 
-    scenes = std::unordered_map<uint64_t, std::shared_ptr<Scene>>();
+    scenes = std::unordered_map<std::string, std::shared_ptr<Scene>>();
 }
 
 SceneManager* SceneManager::instance()
@@ -41,18 +41,15 @@ void SceneManager::draw(Display *display)
     }
 }
 
-uint64_t SceneManager::add(std::shared_ptr<Scene> scene)
+void SceneManager::add(std::string sceneName, std::shared_ptr<Scene> scene)
 {
-    auto insertedScene = scenes.insert(std::make_pair(insertedSceneId, scene));
-    ++insertedSceneId;
-    insertedScene.first->second->onCreate();
-    return insertedSceneId - 1;
-    
+    auto insertedScene = scenes.insert(std::make_pair(sceneName, scene));
+    insertedScene.first->second->onCreate(); 
 }
 
-void SceneManager::switchTo(uint64_t sceneId)
+void SceneManager::switchTo(std::string sceneName)
 {
-    auto scenesIt = scenes.find(sceneId);
+    auto scenesIt = scenes.find(sceneName);
     if(scenesIt != scenes.end()) {
         if(curScene) {
             curScene->onDeactivate();
@@ -63,9 +60,9 @@ void SceneManager::switchTo(uint64_t sceneId)
     }
 }
 
-void SceneManager::remove(uint64_t sceneId)
+void SceneManager::remove(std::string sceneName)
 {
-    auto scenesIt = scenes.find(sceneId);
+    auto scenesIt = scenes.find(sceneName);
     if(scenesIt != scenes.end()) {
         if(curScene == scenesIt->second) {
             curScene = nullptr;
