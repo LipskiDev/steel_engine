@@ -11,7 +11,9 @@ class BaseTerrain {
 public:
     virtual void fillMesh() = 0;
     virtual void Render() = 0;
-    void setShader(Shader sh) { this->sh = sh; };
+    void setShader(Shader sh) { 
+        //this->sh = sh; 
+    };
 
 protected: 
     Mesh m;

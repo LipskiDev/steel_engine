@@ -24,6 +24,7 @@
 #include "../utils/Shader.h"
 #include "../ui/Display.h"
 #include "../utils/Scene.h"
+#include "../objects/Camera.h"
 
 #include "../model/Model.h"
 
@@ -34,19 +35,11 @@
 class TerrainGenerationScene : virtual public Scene {
 
 private:
-    Camera *camera;
-    Shader mainShader;
-    PerlinNoiseChunkGenerator *generator;
-    uint32_t waterHeightLocation;
-    uint32_t meshHeightLocation;
-    DirectionalLight directionalLight;
-
-    Model ourModel = Model(ROOT_DIR"/assets/models/fatTroll.obj");
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<ShaderProgram> mainShader;
+    std::unique_ptr<PerlinNoiseChunkGenerator> generator;
 
     float scale = 1.0f;
-
-    int scaleLocation;
-    int modelLocation;
 
     glm::mat4 model = glm::mat4(1.0f);
 
@@ -54,30 +47,26 @@ private:
 public:
     Display *display;
 
-    TerrainGenerationScene(Display *window) { 
+    TerrainGenerationScene(Display *window) {
         display = window;
     }
 
     void onCreate() {
-        mainShader = Shader(ROOT_DIR"/assets/shaders/trollVertex.glsl", ROOT_DIR"/assets/shaders/trollFragment.glsl"); 
-        mainShader.bind();
+        mainShader = make_unique<ShaderProgram>(std::initializer_list<std::pair<std::string_view, Shader::Type>> {
+            {ROOT_DIR"/assets/shaders/terrainVertex.glsl", Shader::Type::Vertex},
+            {ROOT_DIR"/assets/shaders/terrainFragment.glsl", Shader::Type::Fragment}
+        });
+        mainShader->use();
 
-        generator = new PerlinNoiseChunkGenerator();
+        generator = make_unique<PerlinNoiseChunkGenerator>();
 
-        camera = new Camera(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 90.f, 1920.f / 1080.f, 1.f, 1000.f);
+        camera = make_unique<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 90.f, 1920.f / 1080.f, 1.f, 1000.f);
 
-        uint32_t waterHeightLocation = mainShader.getUniformLocation("waterHeight");
-        uint32_t meshHeightLocation = mainShader.getUniformLocation("meshHeight");
+        mainShader->set_float_uniform("waterHeight", generator->getWaterHeight());
+        mainShader->set_float_uniform("meshHeight", generator->getMeshHeight());
 
-        Shader::setFloat(waterHeightLocation, generator->getWaterHeight());
-        Shader::setFloat(meshHeightLocation, generator->getMeshHeight());   
 
-        mainShader.addCamera(camera);
-
-        
-        scaleLocation = mainShader.getUniformLocation("scale");
-        modelLocation = mainShader.getUniformLocation("model");
-        Shader::setFloat(scaleLocation, 1.0f);
+        mainShader->set_float_uniform("scale", 1.0f);
 
 
     }
@@ -90,16 +79,16 @@ public:
         InputHandler *inputHandler = InputHandler::instance();
 
 
-        inputHandler->addKeyHoldCallback(GLFW_KEY_W, [this](){ moveCamera(Vector2D<int>{0, 1}); });
-        inputHandler->addKeyHoldCallback(GLFW_KEY_A, [this](){ moveCamera(Vector2D<int>{-1, 0}); });
-        inputHandler->addKeyHoldCallback(GLFW_KEY_S, [this](){ moveCamera(Vector2D<int>{0, -1}); });
-        inputHandler->addKeyHoldCallback(GLFW_KEY_D, [this](){ moveCamera(Vector2D<int>{1, 0}); });
+        inputHandler->addKeyHoldCallback(GLFW_KEY_W, [this] () { moveCamera(Vector2D<int>{0, 1}); });
+        inputHandler->addKeyHoldCallback(GLFW_KEY_A, [this] () { moveCamera(Vector2D<int>{-1, 0}); });
+        inputHandler->addKeyHoldCallback(GLFW_KEY_S, [this] () { moveCamera(Vector2D<int>{0, -1}); });
+        inputHandler->addKeyHoldCallback(GLFW_KEY_D, [this] () { moveCamera(Vector2D<int>{1, 0}); });
 
-        inputHandler->addButtonPressCallback(GLFW_MOUSE_BUTTON_RIGHT, [this](){ exitUi(); });
-        inputHandler->addButtonReleaseCallback(GLFW_MOUSE_BUTTON_RIGHT, [this](){ enterUi(); });
+        inputHandler->addButtonPressCallback(GLFW_MOUSE_BUTTON_RIGHT, [this] () { exitUi(); });
+        inputHandler->addButtonReleaseCallback(GLFW_MOUSE_BUTTON_RIGHT, [this] () { enterUi(); });
 
-        inputHandler->addMouseMoveCallback([this](double x, double y) { lookAround(x, -y); });
-        inputHandler->addKeyPressCallback(GLFW_KEY_ESCAPE, [this](){ display->close(); });
+        inputHandler->addMouseMoveCallback([this] (double x, double y) { lookAround(x, -y); });
+        inputHandler->addKeyPressCallback(GLFW_KEY_ESCAPE, [this] () { display->close(); });
 
         glfwSetKeyCallback(display->getWindow(), &InputHandler::registerKeys);
         glfwSetMouseButtonCallback(display->getWindow(), &InputHandler::registerButtons);
@@ -111,20 +100,14 @@ public:
         display->addFloatSlider("Terrain", "Noise Scale", &generator->noiseScale, 0, 1000);
         display->addFloatSlider("Terrain", "Persistence", &generator->persistence, 0, 1);
         display->addFloatSlider("Terrain", "Lacunarity", &generator->lacunarity, 1, 64);
-        display->addButton("Terrain", "Regenerate", [this](){ generator->generateAllChunks(); });
+        display->addButton("Terrain", "Regenerate", [this] () { generator->generateAllChunks(); });
 
         display->initImGui();
 
-        directionalLight = DirectionalLight(
-            glm::vec3(1.0, -0.5, 0.2),  // Direction
-            glm::vec3(0.8, 0.8, 0.8),   // Ambient
-            glm::vec3(0.3, 0.3, 0.3),   // Diffuse
-            glm::vec3(0.5, 0.5, 0.5)    // Specular
-        );
 
-        mainShader.bind();
 
-        mainShader.addDirectionalLight(directionalLight);
+        mainShader->use();
+
     }
 
     void enterUi() {
@@ -156,25 +139,25 @@ public:
         int x = input.x;
         int y = input.y;
 
-        if (x == -1){
+        if(x == -1) {
             camera->ProcessKeyboard(LEFT, deltaTime);
         }
 
-        if (x == 1){
+        if(x == 1) {
             camera->ProcessKeyboard(RIGHT, deltaTime);
         }
 
-        if (y == -1){
+        if(y == -1) {
             camera->ProcessKeyboard(BACKWARD, deltaTime);
         }
 
-        if (y == 1){
+        if(y == 1) {
             camera->ProcessKeyboard(FORWARD, deltaTime);
         }
     }
 
     void update(float deltaTime) {
-        mainShader.updateCamera();
+        camera->UpdateShader(mainShader);
     }
 
     void lateUpdate(float deltaTime) {
@@ -182,14 +165,14 @@ public:
     }
 
     void draw(Display *display) override {
-        mainShader.bind();
+        mainShader->use();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        uint modelLocation = mainShader.getUniformLocation("model");
-        Shader::setMat4(modelLocation, model);
+        mainShader->set_mat4_uniform("model", model);
 
-        ourModel.Draw(mainShader);
+
+        generator->renderChunk(0, 0);
     }
 };
 

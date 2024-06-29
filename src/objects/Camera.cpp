@@ -75,3 +75,14 @@ void Camera::updateCameraVectors() {
     Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     Up    = glm::normalize(glm::cross(Right, Front));
 }
+
+
+void Camera::UpdateShader(std::unique_ptr<ShaderProgram> &shader) {
+    glm::mat4 view = getViewMat();
+
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, nearZ, farZ);
+
+    shader->set_mat4_uniform("projection", projection);
+    shader->set_mat4_uniform("view", view);
+    shader->set_vec3_uniform("viewPos", Position.x, Position.y, Position.z);
+}

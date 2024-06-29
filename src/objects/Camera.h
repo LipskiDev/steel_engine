@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../utils/Shader.h"
+
 
 enum Camera_Movement {
     FORWARD,
@@ -55,6 +57,9 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime);
 
     void ProcessMouseInput(float xoffset, float yoffset, bool constrainPitch);
+
+    void UpdateShader(std::unique_ptr<ShaderProgram> &shader);
+
 
 private:
     void updateCameraVectors();
