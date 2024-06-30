@@ -24,20 +24,20 @@ target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 
 
 add_executable(steel_engine 
-    src/GatesOfHell.cpp
-    src/ui/Display.h src/ui/Display.cpp
+    src/gates_of_hell.cpp
+    src/ui/display.h src/ui/display.cpp
     src/math/noise.h
-    src/math/Vector.h
-    src/objects/Camera.h src/objects/Camera.cpp
+    "src/math/vector.h"
+    src/objects/camera.h src/objects/camera.cpp
     # src/terrain/terrain.h src/terrain/terrain.cpp
-    src/utils/SceneManager.h src/utils/SceneManager.cpp
-    src/input/InputHandler.h src/input/InputHandler.cpp
-    src/terrain/PerlinNoiseChunkGenerator.h src/terrain/PerlinNoiseChunkGenerator.cpp
-    src/model/Mesh.h 
-    src/model/Model.h
-    src/utils/Shader.h src/utils/Shader.cpp
+    src/utils/scene_manager.h src/utils/scene_manager.cpp
+    "src/input/input_handler.h" "src/input/input_handler.cpp"
+    src/terrain/perlin_noise_chunk_generator.h src/terrain/perlin_noise_chunk_generator.cpp
+    src/model/mesh.h 
+    src/model/model.h
+    src/utils/shader.h src/utils/shader.cpp
     src/utils/utils.h src/utils/utils.cpp
-    src/objects/DirectionalLight.h src/objects/DirectionalLight.cpp
+    src/objects/directional_light.h src/objects/directional_light.cpp
     lib/stb_image.h lib/stb_image.cpp
     ${IMGUI_PATH}/backends/imgui_impl_opengl3.h ${IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
     ${IMGUI_PATH}/backends/imgui_impl_glfw.h ${IMGUI_PATH}/backends/imgui_impl_glfw.cpp

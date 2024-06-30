@@ -5,10 +5,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../utils/Shader.h"
+#include "../utils/shader.h"
 
 
-enum Camera_Movement {
+enum CameraMovement {
     FORWARD,
     BACKWARD,
     LEFT,
@@ -16,53 +16,53 @@ enum Camera_Movement {
 };
 
 // Default camera values
-const float SPEED       =  5.f;
-const float SENSITIVITY =  0.1f;
-const float ZOOM        =  45.0f;
+const float kSpeed       =  5.f;
+const float kSensitivity =  0.1f;
+const float kZoom        =  45.0f;
 
 class Camera {
 public:
     // Camera Position + Directions
-    glm::vec3 Position;
-    glm::vec3 Front;
-    glm::vec3 Up;
-    glm::vec3 Right;
-    glm::vec3 WorldUp;
+    glm::vec3 position_;
+    glm::vec3 front_;
+    glm::vec3 up_;
+    glm::vec3 right_;
+    glm::vec3 world_up_;
 
     // Camera Angles
-    float Yaw;
-    float Pitch;
+    float yaw_;
+    float pitch_;
 
     // Camera Stats
-    float Speed;
-    float MouseSensitivity;
+    float speed_;
+    float mouse_sensitivity_;
 
-    float fov;
-    float aspectRatio;   
-    float nearZ;
-    float farZ; 
+    float fov_;
+    float aspect_ratio_;   
+    float near_z_;
+    float far_z_; 
 
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.f, float pitch = 0.0f, float fov = 45.f, float ratio = 16.f / 9.f, float nearZ = 0.1f, float farZ = 100.f);
 
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float fov, float ratio, float nearZ, float farZ);
+    Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch, float fov, float ratio, float near_z, float far_z);
 
-    glm::mat4 getViewMat() {
+    glm::mat4 GetViewMat() {
         return glm::lookAt(
-            Position,
-            Position + Front,
-            Up
+            position_,
+            position_ + front_,
+            up_
         );
     }
 
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+    void ProcessKeyboard(CameraMovement direction, float delta_time);
 
-    void ProcessMouseInput(float xoffset, float yoffset, bool constrainPitch);
+    void ProcessMouseInput(float x_offset, float y_offset, bool constrain_pitch);
 
     void UpdateShader(std::unique_ptr<ShaderProgram> &shader);
 
 
 private:
-    void updateCameraVectors();
+    void UpdateCameraVectors();
 };
 
 #endif

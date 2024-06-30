@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "camera.h"
 
 #include <iostream>
 
@@ -7,82 +7,82 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float fov, float ratio, float nearZ, float farZ) {
-    Front = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
-    Speed = SPEED;
-    MouseSensitivity = SENSITIVITY;
-    Position = position;
-    WorldUp = up;
-    Yaw = yaw;
-    Pitch = pitch;
-    this->fov = fov;
-    this->aspectRatio = ratio;
-    this->nearZ = nearZ;
-    this->farZ = farZ;
-    updateCameraVectors();
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float fov, float ratio, float near_z, float far_z) {
+    front_ = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
+    speed_ = kSpeed;
+    mouse_sensitivity_ = kSensitivity;
+    position_ = position;
+    world_up_ = up;
+    yaw_ = yaw;
+    pitch_ = pitch;
+    fov_ = fov;
+    aspect_ratio_ = ratio;
+    near_z_ = near_z;
+    far_z_ = far_z;
+    UpdateCameraVectors();
 }
 
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float fov, float ratio, float nearZ, float farZ) {
-    Front = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
-    Speed = SPEED;
-    MouseSensitivity = SENSITIVITY;
-    Position = glm::vec3(posX, posY, posZ);
-    WorldUp = glm::vec3(upX, upY, upZ);
-    Yaw = yaw;
-    Pitch = pitch;
-    this->fov = fov;
-    this->aspectRatio = ratio;
-    this->nearZ = nearZ;
-    this->farZ = farZ;
-    updateCameraVectors();
+Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch, float fov, float ratio, float near_z, float far_z) {
+    front_ = glm::vec3(glm::vec3(0.0f, 0.0f, -1.0f));
+    speed_ = kSpeed;
+    mouse_sensitivity_ = kSensitivity;
+    position_ = glm::vec3(pos_x, pos_y, pos_z);
+    world_up_ = glm::vec3(up_x, up_y, up_z);
+    yaw_ = yaw;
+    pitch_ = pitch;
+    fov_ = fov;
+    aspect_ratio_ = ratio;
+    near_z_ = near_z;
+    far_z_ = far_z;
+    UpdateCameraVectors();
 }
 
-void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
+void Camera::ProcessKeyboard(CameraMovement direction, float delta_time)
 {
-    float velocity = Speed * deltaTime * 100.f;
+    float velocity = speed_ * delta_time * 100.f;
     if (direction == FORWARD)
-        Position += Front * velocity;
+        position_ += front_ * velocity;
     if (direction == BACKWARD)
-        Position -= Front * velocity;
+        position_ -= front_ * velocity;
     if (direction == LEFT)
-        Position -= Right * velocity;
+        position_ -= right_ * velocity;
     if (direction == RIGHT)
-        Position += Right * velocity;
+        position_ += right_ * velocity;
 }
 
-void Camera::ProcessMouseInput(float xoffset, float yoffset, bool constrainPitch) {
-    xoffset *= MouseSensitivity;
-    yoffset *= MouseSensitivity;
+void Camera::ProcessMouseInput(float x_offset, float y_offset, bool constrain_pitch) {
+    x_offset *= mouse_sensitivity_;
+    y_offset *= mouse_sensitivity_;
 
-    Yaw += xoffset;
-    Pitch += yoffset;
+    yaw_ += x_offset;
+    pitch_ += y_offset;
 
-    if(constrainPitch) {
-        if (Pitch > 89.0f) Pitch = 89.0f;
-        if (Pitch < -89.0f) Pitch = -89.0f;
+    if(constrain_pitch) {
+        if (pitch_ > 89.0f) pitch_ = 89.0f;
+        if (pitch_ < -89.0f) pitch_ = -89.0f;
     }
 
-    updateCameraVectors();
+    UpdateCameraVectors();
 }
 
-void Camera::updateCameraVectors() {
+void Camera::UpdateCameraVectors() {
     glm::vec3 front;
-    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    front.y = sin(glm::radians(Pitch));
-    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    Front = glm::normalize(front);
+    front.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+    front.y = sin(glm::radians(pitch_));
+    front.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+    front_ = glm::normalize(front);
     // also re-calculate the Right and Up vector
-    Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    Up    = glm::normalize(glm::cross(Right, Front));
+    right_ = glm::normalize(glm::cross(front_, world_up_));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    up_    = glm::normalize(glm::cross(right_, front_));
 }
 
 
 void Camera::UpdateShader(std::unique_ptr<ShaderProgram> &shader) {
-    glm::mat4 view = getViewMat();
+    glm::mat4 view = GetViewMat();
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, nearZ, farZ);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect_ratio_, near_z_, far_z_);
 
-    shader->set_mat4_uniform("projection", projection);
-    shader->set_mat4_uniform("view", view);
-    shader->set_vec3_uniform("viewPos", Position.x, Position.y, Position.z);
+    shader->SetMat4Uniform("projection", projection);
+    shader->SetMat4Uniform("view", view);
+    shader->SetVec3Uniform("viewPos", position_.x, position_.y, position_.z);
 }

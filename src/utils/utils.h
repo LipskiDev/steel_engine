@@ -5,7 +5,7 @@
 #include <iostream>
 
 namespace Utils {
-  std::string readFileToString(const char *);
+  std::string ReadFileToString(const char *);
 }
 
 #endif // UTILS_h

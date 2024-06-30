@@ -9,7 +9,7 @@
 #include <assimp/postprocess.h>
 
 #include "mesh.h"
-#include "../utils/Shader.h"
+#include "../utils/shader.h"
 
 #include <string>
 #include <fstream>
@@ -24,24 +24,24 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 class Model 
 {
 public:
-    vector<Texture> textures_loaded;	
-    vector<Mesh>    meshes;
-    string directory;
-    bool gammaCorrection;
+    vector<Texture> textures_loaded_;	
+    vector<Mesh>    meshes_;
+    string directory_;
+    bool gamma_correction_;
 
-    Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+    Model(string const &path, bool gamma = false) : gamma_correction_(gamma)
     {
-        loadModel(path);
+        LoadModel(path);
     }
 
-    void Draw(ShaderProgram &shader)
+    void Draw(unique_ptr<ShaderProgram> &shader)
     {
-        for(unsigned int i = 0; i < meshes.size(); i++)
-            meshes[i].Draw(shader);
+        for(unsigned int i = 0; i < meshes_.size(); i++)
+            meshes_[i].Draw(shader);
     }
     
 private:
-    void loadModel(string const &path)
+    void LoadModel(string const &path)
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -52,27 +52,27 @@ private:
             return;
         }
 
-        directory = path.substr(0, path.find_last_of('/'));
+        directory_ = path.substr(0, path.find_last_of('/'));
 
-        processNode(scene->mRootNode, scene);
+        ProcessNode(scene->mRootNode, scene);
     }
 
-    void processNode(aiNode *node, const aiScene *scene)
+    void ProcessNode(aiNode *node, const aiScene *scene)
     {
         for(unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(processMesh(mesh, scene));
+            meshes_.push_back(ProcessMesh(mesh, scene));
         }
 
         for(unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            processNode(node->mChildren[i], scene);
+            ProcessNode(node->mChildren[i], scene);
         }
 
     }
 
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+    Mesh ProcessMesh(aiMesh *mesh, const aiScene *scene)
     {
         vector<Vertex> vertices;
         vector<unsigned int> indices;
@@ -130,22 +130,22 @@ private:
 
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];    
 
-        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+        vector<Texture> diffuse_maps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
 
-        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        vector<Texture> specular_maps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        std::vector<Texture> normal_maps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
 
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+        std::vector<Texture> height_maps = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+        textures.insert(textures.end(), height_maps.begin(), height_maps.end());
         
         return Mesh(vertices, indices, textures);
     }
 
-    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
+    vector<Texture> LoadMaterialTextures(aiMaterial *mat, aiTextureType type, string type_name)
     {
         vector<Texture> textures;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
@@ -154,11 +154,11 @@ private:
             mat->GetTexture(type, i, &str);
             bool skip = false;
 
-            for(unsigned int j = 0; j < textures_loaded.size(); j++)
+            for(unsigned int j = 0; j < textures_loaded_.size(); j++)
             {
-                if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+                if(std::strcmp(textures_loaded_[j].path.data(), str.C_Str()) == 0)
                 {
-                    textures.push_back(textures_loaded[j]);
+                    textures.push_back(textures_loaded_[j]);
                     skip = true; 
                     break;
                 }
@@ -166,11 +166,11 @@ private:
             if(!skip)
             {   
                 Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
-                texture.type = typeName;
+                texture.id = TextureFromFile(str.C_Str(), this->directory_);
+                texture.type = type_name;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
-                textures_loaded.push_back(texture);  
+                textures_loaded_.push_back(texture);  
             }
         }
         return textures;
@@ -183,22 +183,22 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     string filename = string(path);
     filename = directory + '/' + filename;
 
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
+    unsigned int texture_id;
+    glGenTextures(1, &texture_id);
 
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    int width, height, nr_components;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nr_components, 0);
     if (data)
     {
         GLenum format;
-        if (nrComponents == 1)
+        if (nr_components == 1)
             format = GL_RED;
-        else if (nrComponents == 3)
+        else if (nr_components == 3)
             format = GL_RGB;
-        else if (nrComponents == 4)
+        else if (nr_components == 4)
             format = GL_RGBA;
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
+        glBindTexture(GL_TEXTURE_2D, texture_id);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -215,6 +215,6 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
         stbi_image_free(data);
     }
 
-    return textureID;
+    return texture_id;
 }
 #endif

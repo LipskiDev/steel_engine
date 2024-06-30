@@ -3,24 +3,24 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-float lerp(float t, float a, float b) 
+float Lerp(float t, float a, float b) 
 {
     return a + t * (b - a);
 }
 
-float fade(float t)
+float Fade(float t)
 {
     return ((6 * t - 15) * t + 10) * t * t * t;
 }
 
-float grad(int hash, double x, double y, double z) {
+float Grad(int hash, double x, double y, double z) {
    int h = hash & 15;
    double u = h < 8 ? x : y,
           v = h < 4 ? y : h == 12 || + h == 14 ? x : z;
    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
-float perlinNoise(float x, float y, std::vector<int> &p) {
+float PerlinNoise(float x, float y, std::vector<int> &p) {
     float z = 0.5f;
 
     int X = (int) floor(x) & 255;
@@ -31,24 +31,24 @@ float perlinNoise(float x, float y, std::vector<int> &p) {
     y -= floor(y);
     z -= floor(z);
 
-    double u = fade(x);
-    double v = fade(y);
-    double w = fade(z);
+    double u = Fade(x);
+    double v = Fade(y);
+    double w = Fade(z);
 
     int A = p[X  ]+Y, AA = p[A]+Z, AB = p[A+1]+Z,
         B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;
 
-    return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z),
-                                    grad(p[BA], x - 1, y, z)),
-                            lerp(u, grad(p[AB], x, y - 1, z),
-                                    grad(p[BB], x - 1, y - 1, z))),
-                    lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1),
-                                    grad(p[BA + 1], x - 1, y, z - 1)),
-                            lerp(u, grad(p[AB + 1], x, y - 1, z - 1),
-                                    grad(p[BB + 1], x - 1, y - 1, z - 1))));
+    return Lerp(w, Lerp(v, Lerp(u, Grad(p[AA], x, y, z),
+                                    Grad(p[BA], x - 1, y, z)),
+                            Lerp(u, Grad(p[AB], x, y - 1, z),
+                                    Grad(p[BB], x - 1, y - 1, z))),
+                    Lerp(v, Lerp(u, Grad(p[AA + 1], x, y, z - 1),
+                                    Grad(p[BA + 1], x - 1, y, z - 1)),
+                            Lerp(u, Grad(p[AB + 1], x, y - 1, z - 1),
+                                    Grad(p[BB + 1], x - 1, y - 1, z - 1))));
 }
 
-std::vector<int> getPermutationVector () {
+std::vector<int> GetPermutationVector () {
     std::vector<int> p;
 
     std::vector<int> permutation = { 

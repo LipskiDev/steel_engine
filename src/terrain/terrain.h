@@ -4,8 +4,8 @@
 #include <vector>
 #include <random>
 
-#include "../utils/Shader.h"
-#include "../model/Mesh.h"
+#include "../utils/shader.h"
+#include "../model/mesh.h"
 
 class BaseTerrain {
 public:

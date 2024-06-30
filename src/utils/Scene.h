@@ -6,22 +6,22 @@
 
 #include <iostream>
 
-#include "../ui/Display.h"
+#include "../ui/display.h"
 
 class Scene {
 public:
-    virtual void onCreate() = 0;
+    virtual void OnCreate() = 0;
 
-    virtual void onDestroy() = 0;
+    virtual void OnDestroy() = 0;
 
-    virtual void onActivate() = 0;
+    virtual void OnActivate() = 0;
 
-    virtual void onDeactivate() = 0;
+    virtual void OnDeactivate() = 0;
 
-    virtual void processInput() {};
-    virtual void update(float deltaTime) {};
-    virtual void lateUpdate(float deltaTime) {};
-    virtual void draw(Display *window) {};
+    virtual void ProcessInput() {};
+    virtual void Update(float delta_time) {};
+    virtual void LateUpdate(float delta_time) {};
+    virtual void Draw(Display *window) {};
 };
 
 #endif // SCENE_H

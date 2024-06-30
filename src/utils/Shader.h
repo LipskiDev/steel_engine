@@ -35,12 +35,12 @@ public:
     Shader &operator=(Shader &&shader) noexcept;
     ~Shader();
 
-    std::uint32_t identifier() const;
+    std::uint32_t ShaderId() const;
 
 private:
-    std::uint32_t identifier_ {0};
+    std::uint32_t shaderId_ {0};
 
-    static const std::string &shader_typename(Type type);
+    static const std::string &ShaderTypename(Type type);
 };
 
 class ShaderProgram
@@ -54,36 +54,36 @@ public:
     ShaderProgram &operator=(ShaderProgram &&other) noexcept;
     ~ShaderProgram();
 
-    void use();
-    void set_bool_uniform(const std::string &uniform_name, bool value);
-    void set_int_uniform(const std::string &uniform_name, int value);
-    void set_int_array_uniform(const std::string &uniform_name, const int *value, GLsizei count);
-    void set_float_uniform(const std::string &uniform_name, float value);
-    void set_float_array_uniform(const std::string &uniform_name, const float *value, GLsizei count);
-    void set_vec2_uniform(const std::string &uniform_name, float x, float y);
-    void set_vec2_uniform(const std::string &uniform_name, const glm::vec2 &vector);
-    void set_vec2_array_uniform(const std::string &uniform_name, const std::vector<glm::vec2> &value, GLsizei count);
-    void set_vec3_uniform(const std::string &uniform_name, float x, float y, float z);
-    void set_vec3_uniform(const std::string &uniform_name, const glm::vec3 &vector);
-    void set_vec4_uniform(const std::string &uniform_name, const glm::vec4 &vector);
-    void set_mat4_uniform(const std::string &uniform_name, const glm::mat4 &transform);
-    std::uint32_t programId {0};
+    void Use();
+    void SetBoolUniform(const std::string &uniform_name, bool value);
+    void SetIntUniform(const std::string &uniform_name, int value);
+    void SetIntArrayUniform(const std::string &uniform_name, const int *value, GLsizei count);
+    void SetFloatUniform(const std::string &uniform_name, float value);
+    void SetFloatArrayUniform(const std::string &uniform_name, const float *value, GLsizei count);
+    void SetVec2Uniform(const std::string &uniform_name, float x, float y);
+    void SetVec2Uniform(const std::string &uniform_name, const glm::vec2 &vector);
+    void SetVec2ArrayUniform(const std::string &uniform_name, const std::vector<glm::vec2> &value, GLsizei count);
+    void SetVec3Uniform(const std::string &uniform_name, float x, float y, float z);
+    void SetVec3Uniform(const std::string &uniform_name, const glm::vec3 &vector);
+    void SetVec4Uniform(const std::string &uniform_name, const glm::vec4 &vector);
+    void SetMat4Uniform(const std::string &uniform_name, const glm::mat4 &transform);
+    std::uint32_t programId_ {0};
 
 private:
     std::unordered_map<std::string, std::uint32_t> uniform_locations_ {};
 
-    void retrieve_uniforms();
+    void RetrieveUniforms();
 };
 
 // Auxiliary free functions
-void check_shader_compilation(std::uint32_t shader_id, std::string_view shader_type);
-Shader load_shader_from_file(std::string_view filepath, Shader::Type type);
-void check_shader_program_link_status(std::uint32_t shader_program_id,
+void CheckShaderCompilation(std::uint32_t shader_id, std::string_view shader_type);
+Shader LoadShaderFromFile(std::string_view filepath, Shader::Type type);
+void CheckShaderProgramLinkStatus(std::uint32_t shader_program_id,
     std::initializer_list<std::pair<std::string_view, Shader::Type>> shader_data);
-std::string process_shader_include(std::string shader_source, std::filesystem::path shader_path);
+std::string ProcessShaderInclude(std::string shader_source, std::filesystem::path shader_path);
 
 template <typename T>
-constexpr std::underlying_type_t<T> to_underlying(T enumerator) noexcept
+constexpr std::underlying_type_t<T> ToUnderlying(T enumerator) noexcept
 {
     return static_cast<std::underlying_type_t<T>>(enumerator);
 }

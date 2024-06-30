@@ -4,12 +4,12 @@
 #include <fstream>
 #include <cstdlib>
 
-std::string Utils::readFileToString(const char *filename)
+std::string Utils::ReadFileToString(const char *file_name)
 {
-    std::ifstream input_file(filename);
+    std::ifstream input_file(file_name);
     if (!input_file.is_open()) {
         std::cerr << "Could not open the file - '"
-                  << filename << "'" << std::endl;
+                  << file_name << "'" << std::endl;
         exit(EXIT_FAILURE);
     }
 

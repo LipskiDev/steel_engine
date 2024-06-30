@@ -8,7 +8,7 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
-#include "../utils/Shader.h"
+#include "../utils/shader.h"
 
 #include <string>
 #include <vector>
@@ -48,10 +48,10 @@ public:
         this->indices = indices;
         this->textures = textures;
 
-        setupMesh();
+        SetupMesh();
     }
 
-    void Draw(ShaderProgram &shader) 
+    void Draw(unique_ptr<ShaderProgram> &shader)
     {
         unsigned int diffuseNr  = 1;
         unsigned int specularNr = 1;
@@ -73,7 +73,7 @@ public:
              else if(name == "texture_height")
                 number = std::to_string(heightNr++); 
 
-            glUniform1i(glGetUniformLocation(shader.programId, (name + number).c_str()), i);
+            glUniform1i(glGetUniformLocation(shader->programId_, (name + number).c_str()), i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
         
@@ -84,7 +84,7 @@ public:
         glActiveTexture(GL_TEXTURE0);
     }
 
-    void clearMesh() {
+    void ClearMesh() {
         vertices.clear();
         indices.clear();
         textures.clear();
@@ -93,7 +93,7 @@ public:
 private:
     unsigned int VBO, EBO;
 
-    void setupMesh()
+    void SetupMesh()
     {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);

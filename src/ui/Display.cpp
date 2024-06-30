@@ -1,4 +1,4 @@
-#include "Display.h"
+#include "display.h"
 
 #include <iostream>
 #include <sstream>
@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 
 Display::Display(uint64_t width, uint64_t height, const char *title) {
     
-    lastTime = glfwGetTime();
+    last_time_ = glfwGetTime();
 
     // Setup glfw window
     if (!glfwInit())
@@ -21,17 +21,17 @@ Display::Display(uint64_t width, uint64_t height, const char *title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(width, height, title, NULL, NULL);
+    window_ = glfwCreateWindow(width, height, title, NULL, NULL);
 
-    if (window == NULL)
+    if (window_ == NULL)
     {
         std::cout << "Failed to open GLFW window" << std::endl;
         glfwTerminate();
         exit(-1);
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height) {
+    glfwMakeContextCurrent(window_);
+    glfwSetFramebufferSizeCallback(window_, [](GLFWwindow *window, int width, int height) {
         glViewport(0, 0, width, height);
     });
     
@@ -46,9 +46,9 @@ Display::Display(uint64_t width, uint64_t height, const char *title) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io_ = ImGui::GetIO(); (void)io_;
+    io_.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io_.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -67,9 +67,9 @@ Display::~Display()
     
 }
 
-bool Display::isClosed()
+bool Display::IsClosed()
 {
-    return isDisplayClosed;
+    return is_display_closed_;
 }
 
 void Display::Update(bool draw, bool pollevents)
@@ -82,34 +82,34 @@ void Display::Clear(GLfloat r, GLfloat g, GLfloat b)
     
 }
 
-bool Display::shouldClose()
+bool Display::ShouldClose()
 {
-    return glfwWindowShouldClose(window);
+    return glfwWindowShouldClose(window_);
 }
 
-void Display::close()
+void Display::Close()
 {
-    glfwSetWindowShouldClose(window, true);
+    glfwSetWindowShouldClose(window_, true);
 }
 
-void Display::drawImGuis()
+void Display::DrawImGuis()
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     
-    for(auto window : imGuiWindows) {
+    for(auto win : im_gui_windows_) {
         
-        ImGui::Begin(window.first.c_str());
+        ImGui::Begin(win.first.c_str());
 
-        for(ImGuiWidget *widget : window.second) {
-            if(ImGuiFloatSlider *floatSlider = dynamic_cast<ImGuiFloatSlider *>(widget)) {
-                ImGui::SliderFloat(floatSlider->name.c_str(), floatSlider->value, floatSlider->min, floatSlider->max);
-            } else if(ImGuiIntSlider *intSlider = dynamic_cast<ImGuiIntSlider *>(widget)) {
-                ImGui::SliderInt(intSlider->name.c_str(), intSlider->value, intSlider->min, intSlider->max);
+        for(ImGuiWidget *widget : win.second) {
+            if(ImGuiFloatSlider *float_slider = dynamic_cast<ImGuiFloatSlider *>(widget)) {
+                ImGui::SliderFloat(float_slider->name_.c_str(), float_slider->value_, float_slider->min_, float_slider->max_);
+            } else if(ImGuiIntSlider *int_slider = dynamic_cast<ImGuiIntSlider *>(widget)) {
+                ImGui::SliderInt(int_slider->name_.c_str(), int_slider->value_, int_slider->min_, int_slider->max_);
             } else if(ImGuiButton *button = dynamic_cast<ImGuiButton *>(widget)) {
-                if(ImGui::Button(button->name.c_str())) {
-                    button->callback();
+                if(ImGui::Button(button->name_.c_str())) {
+                    button->callback_();
                 }
             }
         }
@@ -121,57 +121,57 @@ void Display::drawImGuis()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Display::initImGui() {
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+void Display::InitImGui() {
+    ImGui_ImplGlfw_InitForOpenGL(window_, true);
 }
 
-void Display::shutdownImGui() {
+void Display::ShutdownImGui() {
     ImGui_ImplGlfw_Shutdown();
 }
 
-void Display::addIntSlider(std::string uiName, std::string valueName, int *value, int min, int max)
+void Display::AddIntSlider(std::string ui_name, std::string value_name, int *value, int min, int max)
 {
-    ImGuiIntSlider *intSlider = new ImGuiIntSlider();
-    intSlider->name = valueName;
-    intSlider->value = value;
-    intSlider->min = min;
-    intSlider->max = max;
-    imGuiWindows[uiName].push_back(intSlider);
+    ImGuiIntSlider *int_slider = new ImGuiIntSlider();
+    int_slider->name_ = value_name;
+    int_slider->value_ = value;
+    int_slider->min_ = min;
+    int_slider->max_ = max;
+    im_gui_windows_[ui_name].push_back(int_slider);
 }
 
-void Display::addFloatSlider(std::string uiName, std::string valueName, float *value, float min, float max)
+void Display::AddFloatSlider(std::string ui_name, std::string value_name, float *value, float min, float max)
 {
-    ImGuiFloatSlider *floatSlider = new ImGuiFloatSlider();
-    floatSlider->name = valueName;
-    floatSlider->value = value;
-    floatSlider->min = min;
-    floatSlider->max = max;
-    imGuiWindows[uiName].push_back(floatSlider);
+    ImGuiFloatSlider *float_slider = new ImGuiFloatSlider();
+    float_slider->name_ = value_name;
+    float_slider->value_ = value;
+    float_slider->min_ = min;
+    float_slider->max_ = max;
+    im_gui_windows_[ui_name].push_back(float_slider);
 }
 
-void Display::addButton(std::string uiName, std::string buttonText, ImGuiButtonCallback callback)
+void Display::AddButton(std::string ui_name, std::string button_text, ImGuiButtonCallback callback)
 {
     ImGuiButton *button = new ImGuiButton();
-    button->name = buttonText;
-    button->text = buttonText;
-    button->callback = callback;
-    imGuiWindows[uiName].push_back(button);
+    button->name_ = button_text;
+    button->text_ = button_text;
+    button->callback_ = callback;
+    im_gui_windows_[ui_name].push_back(button);
 }
 
-void Display::updateDeltaTime()
+void Display::UpdateDeltaTime()
 {
-    double currentTime = glfwGetTime();
+    double current_time = glfwGetTime();
 
-    deltaTime = currentTime - lastTime;
-    lastTime = currentTime;
+    delta_time_ = current_time - last_time_;
+    last_time_ = current_time;
 }
 
-float Display::getDeltaTime()
+float Display::GetDeltaTime()
 {
-    return deltaTime;
+    return delta_time_;
 }
 
-GLFWwindow* Display::getWindow()
+GLFWwindow* Display::GetWindow()
 {
-    return window;
+    return window_;
 }
