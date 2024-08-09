@@ -27,11 +27,11 @@ add_executable(steel_engine
     src/gates_of_hell.cpp
     src/ui/display.h src/ui/display.cpp
     src/math/noise.h
-    "src/math/vector.h"
+    src/math/vector.h
     src/objects/camera.h src/objects/camera.cpp
     # src/terrain/terrain.h src/terrain/terrain.cpp
     src/utils/scene_manager.h src/utils/scene_manager.cpp
-    "src/input/input_handler.h" "src/input/input_handler.cpp"
+    src/input/input_handler.h src/input/input_handler.cpp
     src/terrain/perlin_noise_chunk_generator.h src/terrain/perlin_noise_chunk_generator.cpp
     src/model/mesh.h 
     src/model/model.h

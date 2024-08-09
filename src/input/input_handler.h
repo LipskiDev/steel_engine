@@ -1,7 +1,7 @@
 #ifndef INPUT_HANDLER_H
 #define INPUT_HANDLER_H
 
-#include "../ui/Display.h"
+#include "../ui/display.h"
 #include <functional>
 #include <unordered_map>
 
