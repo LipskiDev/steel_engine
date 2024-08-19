@@ -88,8 +88,6 @@ ShaderProgram::ShaderProgram(std::initializer_list<std::pair<std::string_view, S
     {
         glDetachShader(programId_, shader.ShaderId());
     }
-
-    RetrieveUniforms();
 }
 
 Shader LoadShaderFromFile(std::string_view filepath, Shader::Type type)
@@ -148,28 +146,6 @@ void CheckShaderProgramLinkStatus(std::uint32_t shader_program_id,
     }
 }
 
-void ShaderProgram::RetrieveUniforms()
-{
-    int number_of_uniforms {0};
-    glGetProgramInterfaceiv(programId_, GL_UNIFORM, GL_ACTIVE_RESOURCES, &number_of_uniforms);
-    std::array<GLenum, 2> properties {GL_NAME_LENGTH, GL_LOCATION};
-    std::array<GLint, 2> results {};
-    std::vector<char> uniform_name(256);
-    for(int uniform = 0; uniform < number_of_uniforms; ++uniform)
-    {
-        glGetProgramResourceiv(programId_, GL_UNIFORM, uniform, static_cast<GLsizei>(properties.size()),
-            properties.data(), static_cast<GLsizei>(results.size()), nullptr, results.data());
-
-        // Get resources (uniform name and uniform location)
-        uniform_name.resize(results[0]);
-        glGetProgramResourceName(programId_, GL_UNIFORM, uniform, static_cast<GLsizei>(uniform_name.size()), nullptr,
-            uniform_name.data());
-        std::uint32_t uniform_location = results.back();
-
-        // The name returned contains a null-terminator, so it's necessary to read uniform_name.size() - 1 characters
-        uniform_locations_.emplace(std::string {uniform_name.data(), uniform_name.size() - 1}, uniform_location);
-    }
-}
 
 ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept : programId_ {other.programId_}
 {
@@ -194,61 +170,73 @@ void ShaderProgram::Use()
 
 void ShaderProgram::SetBoolUniform(const std::string &uniform_name, bool value)
 {
-    glProgramUniform1i(programId_, uniform_locations_[uniform_name], static_cast<int>(value));
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform1i(programId_, location, static_cast<int>(value));
 }
 
 void ShaderProgram::SetIntUniform(const std::string &uniform_name, int value)
 {
-    glProgramUniform1i(programId_, uniform_locations_[uniform_name], value);
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform1i(programId_, location, value);
 }
 
 void ShaderProgram::SetIntArrayUniform(const std::string &uniform_name, const int *value, GLsizei count)
 {
-    glProgramUniform1iv(programId_, uniform_locations_[uniform_name], count, value);
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform1iv(programId_, location, count, value);
 }
 
 void ShaderProgram::SetFloatUniform(const std::string &uniform_name, float value)
 {
-    glProgramUniform1f(programId_, uniform_locations_[uniform_name], value);
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform1f(programId_, location, value);
 }
 
 void ShaderProgram::SetFloatArrayUniform(const std::string &uniform_name, const float *value, GLsizei count)
 {
-    glProgramUniform1fv(programId_, uniform_locations_[uniform_name], count, value);
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform1fv(programId_, location, count, value);
 }
 
 void ShaderProgram::SetVec2Uniform(const std::string &uniform_name, float x, float y)
 {
-    glProgramUniform2f(programId_, uniform_locations_[uniform_name], x, y);
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform2f(programId_, location, x, y);
 }
 
 void ShaderProgram::SetVec2Uniform(const std::string &uniform_name, const glm::vec2 &vector)
 {
-    glProgramUniform2fv(programId_, uniform_locations_[uniform_name], 1, glm::value_ptr(vector));
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform2fv(programId_, location, 1, glm::value_ptr(vector));
 }
 
 void ShaderProgram::SetVec2ArrayUniform(const std::string &uniform_name, const std::vector<glm::vec2> &value,
     GLsizei count)
 {
-    glProgramUniform2fv(programId_, uniform_locations_[uniform_name], count, glm::value_ptr(value.front()));
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform2fv(programId_, location, count, glm::value_ptr(value.front()));
 }
 
 void ShaderProgram::SetVec3Uniform(const std::string &uniform_name, float x, float y, float z)
 {
-    glProgramUniform3f(programId_, uniform_locations_[uniform_name], x, y, z);
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform3f(programId_, location, x, y, z);
 }
 
 void ShaderProgram::SetVec3Uniform(const std::string &uniform_name, const glm::vec3 &vector)
 {
-    glProgramUniform3fv(programId_, uniform_locations_[uniform_name], 1, glm::value_ptr(vector));
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform3fv(programId_, location, 1, glm::value_ptr(vector));
 }
 
 void ShaderProgram::SetVec4Uniform(const std::string &uniform_name, const glm::vec4 &vector)
 {
-    glProgramUniform4fv(programId_, uniform_locations_[uniform_name], 1, glm::value_ptr(vector));
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniform4fv(programId_, location, 1, glm::value_ptr(vector));
 }
 
 void ShaderProgram::SetMat4Uniform(const std::string &uniform_name, const glm::mat4 &matrix)
 {
-    glProgramUniformMatrix4fv(programId_, uniform_locations_[uniform_name], 1, GL_FALSE, glm::value_ptr(matrix));
+    GLint location = glGetUniformLocation(programId_, uniform_name.c_str());
+    glProgramUniformMatrix4fv(programId_, location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
