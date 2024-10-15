@@ -26,7 +26,7 @@
 #include "../utils/scene.h"
 #include "../objects/camera.h"
 
-#include "../model/model.h"
+#include "../rendering/model.h"
 
 #include "../config.h"
 

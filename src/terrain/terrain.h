@@ -5,7 +5,7 @@
 #include <random>
 
 #include "../utils/shader.h"
-#include "../model/mesh.h"
+#include "../rendering/mesh.h"
 
 class BaseTerrain {
 public:

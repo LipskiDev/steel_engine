@@ -23,6 +23,7 @@ add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 
 
+
 add_executable(steel_engine 
     src/gates_of_hell.cpp
     src/ui/display.h src/ui/display.cpp
@@ -33,8 +34,8 @@ add_executable(steel_engine
     src/utils/scene_manager.h src/utils/scene_manager.cpp
     src/input/input_handler.h src/input/input_handler.cpp
     src/terrain/perlin_noise_chunk_generator.h src/terrain/perlin_noise_chunk_generator.cpp
-    src/model/mesh.h 
-    src/model/model.h
+    src/rendering/mesh.h 
+    src/rendering/model.h
     src/utils/shader.h src/utils/shader.cpp
     src/utils/utils.h src/utils/utils.cpp
     src/objects/directional_light.h src/objects/directional_light.cpp
